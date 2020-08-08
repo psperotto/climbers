@@ -11,18 +11,23 @@ source("~/Desktop/climbers/neotropical_climbers_functions.R")
 # First get grid cell values from filtered GBIF data 
 ####
 #### from TV local
-gbif_dir <- "~/Desktop/full_gbif_quest/" 
-climbers_dir <- "~/Desktop/climbers"
-gbif_files <- list.files(paste0(gbif_dir, "z_filtered_gbif"), ".csv")
-full_list <- read.full.gbif(gbif_files, gbif_dir)
-write.csv(full_list, file=paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
+# gbif_dir <- "~/Desktop/full_gbif_quest/" 
+# gbif_files <- list.files(paste0(gbif_dir, "z_filtered_gbif"), ".csv")
+# full_list <- read.full.gbif(gbif_files, gbif_dir)
+# write.csv(full_list, file=paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
 
 # load table back
-setwd()
-full_list <- fread(paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
+# setwd(gbif_dir)
+# full_list <- fread(paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
+# full_list <- full_list[,-1]
+# save.gbif.neotropics(full_list)
+
+##############
+climbers_dir <- "~/Desktop/climbers" # Repo 
+setwd(climbers_dir)
+full_list <- fread(file.choose()) ## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. NÃO COLOCAR ESSE ARQUIVO NO REPO
 full_list <- full_list[,-1]
 
-setwd(climbers_dir)
 full_map <- run.mapDiversity.neotropics(full_list)
 
 pdf("all_angio_div.pdf", height=8, width=5)

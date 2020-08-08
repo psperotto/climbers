@@ -17,12 +17,22 @@ read.full.gbif <- function(gbif_files, gbif_dir) {
 return(full_list)  
 }
 
-# Creates a raster of species-richness grids for the Neotropics (also gets rid of annoying centroids)
-run.mapDiversity.neotropics <- function(full_list, filename="full_neotropical_diversity") {
+save.gbif.neotropics <- function(full_list) {
   centroids <- read.csv(paste0(getwd(),"/centroids.neotropics.csv"), stringsAsFactors = F)[,2:3] # load list of centroids
   table_to_map <- as.data.frame(full_list[,c(1,4,3)])
   cleaned_points <- table_to_map %>% filter(V4 < -20, V4 > -130, V3 < 23, V3 > -23, !V4 %in% centroids$lon, !V3 %in% centroids$lat)   # restricting to the neotropics and removing centroids 
   cleaned_points <- cc_sea(cleaned_points, lon="V4", lat="V3")
+  colnames(cleaned_points) <- c("species", "lon", "lat")
+  write.csv(cleaned_points, file=paste0(getwd(), "/neotropics_tracheophyte_filtered_gbif.csv"))
+}
+
+
+# Creates a raster of species-richness grids for the Neotropics (also gets rid of annoying centroids)
+run.mapDiversity.neotropics <- function(full_list, filename="full_neotropical_diversity") {
+ # centroids <- read.csv(paste0(getwd(),"/centroids.neotropics.csv"), stringsAsFactors = F)[,2:3] # load list of centroids
+ # table_to_map <- as.data.frame(full_list[,c(1,4,3)])
+ # cleaned_points <- table_to_map %>% filter(V4 < -20, V4 > -130, V3 < 23, V3 > -23, !V4 %in% centroids$lon, !V3 %in% centroids$lat)   # restricting to the neotropics and removing centroids 
+ # cleaned_points <- cc_sea(cleaned_points, lon="V4", lat="V3")
   full_neotropics <- monographaR::mapDiversity(cleaned_points, export=T, filename=filename, plot.with.grid = F, plot=T)
   saveRDS(full_neotropics, file=paste0(filename, ".Rdata"))
   return(full_neotropics)
@@ -89,9 +99,10 @@ run.mapDiversity.neotropics.pw <- function(full_list, filename="full_neotropical
   }
   sp.rich <- as.list(calc(stack(sp.rich), sum))
   names(sp.rich) <- "species_richness_pw"
-  
+}  
+
   ### Regression
-  
+plot.res <- function(trait_raster, full_raster, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw") {
   template_background <- full_raster
   template_background[!is.na(template_background)] <- 0
   # set pallete 
