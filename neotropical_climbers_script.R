@@ -45,7 +45,7 @@ for(mechanism_index in 1:8) {
   # Taxize names
   mech_taxized <- gbif.taxize(mech)
   # Get points from full list
-  mech_points <- subset(full_list, full_list$V1 %in% as.character(mech_taxized))
+  mech_points <- subset(full_list, full_list$species %in% as.character(mech_taxized))
   # Get raster of grid cells 
   mech_map <- run.mapDiversity.neotropics(mech_points, filename=paste0("Mechanism_", mechanism_index))
   # Plot pdf
@@ -58,4 +58,11 @@ for(mechanism_index in 1:8) {
 full_map <- readRDS("full_neotropical_diversity.Rdata")
 mechanism1 <- readRDS("Mechanism_1.Rdata")
 
+
+# corrected for PW?
+data = mech_points[mech_points$species %in% phy$tip.label,]
+phy <- phy.list(input.dir=climbers_dir, names="GBMB", search.for=".taxized.tre")[[1]] 
+phy$tip.label <- gsub("_"," ",phy$tip.label)
+phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
+mapDiversity.pw(data, phy)
 

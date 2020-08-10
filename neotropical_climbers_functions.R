@@ -54,8 +54,53 @@ gbif.taxize <- function (species) {
   return(new.names)
 }
 
+
 # Function to plot residuals from linear regression between rasters 
 # (it should also adjust for phylogenetic dependency using phyloweights)
+
+mapDiversity.pw <- function (data, phy, resolution = 1) {
+  wrld_simpl = NULL
+  message("Assuming the columns are ordered as: species, longitude and latitude")
+  geo <- data
+  colnames(geo) <- c("Species", "x", "y")
+  coordinates(geo) = ~x + y
+  r0 <- raster(resolution = resolution)
+  r0[] <- NA
+  r0 <- crop(r0, extent(geo) + +(resolution * 2))
+  cells <- data.frame(spp = data[, 1], cells = cellFromXY(r0, 
+                                                          data[, 2:3]))
+  cells <- unique(cells)
+  ### phyloweight ###
+  
+  phylo.weights.fast <- function(phy) {
+    tree <- phy
+    Ones <- matrix(1, Ntip(tree), 1)
+    C <- vcv.phylo(tree)
+    phylo.weights <- t(Ones) %*% solve(C) / sum(t(Ones) %*% solve(C))
+    return(phylo.weights)
+  }
+  tip.weight <- phylo.weights.fast(phy) * 100
+  species <- colnames(tip.weight)
+  tip.weight <- as.numeric(tip.weight)
+  tip.weight <- cbind(species, tip.weight)
+  
+  cells.pw <- merge(cells, tip.weight, by="species")
+  
+  unique.cells <- unique(cells.pw$cells)
+  sum.pw <- c()
+  for(i in 1:length(unique.cells)) {
+  tmp <- subset(cells.pw, cells.pw$cells %in% unique.cells[i])
+  sum.pw[i] <- sum(as.numeric(tmp$tip.weight))
+  }
+  names(sum.pw) <- unique.cells
+  ########## 
+
+  r0[as.numeric(names(sum.pw))] <- as.numeric(sum.pw)
+  dev.off()
+  plot(r0)
+  return(r0)
+}
+
 run.mapDiversity.neotropics.pw <- function(full_list, filename="full_neotropical_diversity") {
   centroids <- read.csv(paste0(getwd(),"/centroids.neotropics.csv"), stringsAsFactors = F)[,2:3] # load list of centroids
   table_to_map <- as.data.frame(full_list[,c(1,4,3)])
