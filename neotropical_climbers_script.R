@@ -54,15 +54,29 @@ for(mechanism_index in 1:8) {
   dev.off()
 }
 
+###########
 # Load raster back
+rasters <- list.files(climbers_dir, ".Rdata")
+rasters.names <- sub(".Rdata", "", rasters)
+rasters <- lapply(paste0(climbers_dir, "/", rasters), readRDS)
+names(rasters) <- rasters.names
+  
 full_map <- readRDS("full_neotropical_diversity.Rdata")
 mechanism1 <- readRDS("Mechanism_1.Rdata")
 
+### residuals
+plot.res(mechanism1, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
 
-# corrected for PW?
-data = mech_points[mech_points$species %in% phy$tip.label,]
+# adicionar coisas
+
+# corrected for PW
+# Carregar a arvore
 phy <- phy.list(input.dir=climbers_dir, names="GBMB", search.for=".taxized.tre")[[1]] 
+# Substitui "_" por " "
 phy$tip.label <- gsub("_"," ",phy$tip.label)
+# lista de pontos com os nomes que tem na arvore e arvore com tips que tem na lista de pontos
+data <- mech_points[mech_points$species %in% phy$tip.label,]
 phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
+
 mapDiversity.pw(data, phy)
 

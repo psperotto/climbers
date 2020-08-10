@@ -33,7 +33,7 @@ run.mapDiversity.neotropics <- function(full_list, filename="full_neotropical_di
  # table_to_map <- as.data.frame(full_list[,c(1,4,3)])
  # cleaned_points <- table_to_map %>% filter(V4 < -20, V4 > -130, V3 < 23, V3 > -23, !V4 %in% centroids$lon, !V3 %in% centroids$lat)   # restricting to the neotropics and removing centroids 
  # cleaned_points <- cc_sea(cleaned_points, lon="V4", lat="V3")
-  full_neotropics <- monographaR::mapDiversity(cleaned_points, export=T, filename=filename, plot.with.grid = F, plot=T)
+  full_neotropics <- monographaR::mapDiversity(as.data.frame(full_list), export=T, filename=filename, plot.with.grid = F, plot=T)
   saveRDS(full_neotropics, file=paste0(filename, ".Rdata"))
   return(full_neotropics)
 }
@@ -50,12 +50,10 @@ gbif.taxize <- function (species) {
     return(new.name)
   }
   new.names <- pbapply::pbsapply(species, gnr_resolve_x)
-  
   return(new.names)
 }
 
 
-# Function to plot residuals from linear regression between rasters 
 # (it should also adjust for phylogenetic dependency using phyloweights)
 
 mapDiversity.pw <- function (data, phy, resolution = 1) {
@@ -101,53 +99,9 @@ mapDiversity.pw <- function (data, phy, resolution = 1) {
   return(r0)
 }
 
-run.mapDiversity.neotropics.pw <- function(full_list, filename="full_neotropical_diversity") {
-  centroids <- read.csv(paste0(getwd(),"/centroids.neotropics.csv"), stringsAsFactors = F)[,2:3] # load list of centroids
-  table_to_map <- as.data.frame(full_list[,c(1,4,3)])
-  cleaned_points <- table_to_map %>% filter(V4 < -20, V4 > -130, V3 < 23, V3 > -23, !V4 %in% centroids$lon, !V3 %in% centroids$lat)   # restricting to the neotropics and removing centroids 
-  cleaned_points <- cc_sea(cleaned_points, lon="V4", lat="V3")
-
-  taxonomy_tree <- phy.list(input.dir=getwd(), names="GBMB", search.for=".taxized.tre")[[1]]
-  taxonomy_tree$tip.label <- gsub("_", " ", taxonomy_tree$tip.label)
-  
-  tips_trait <- intersect(taxonomy_tree$tip.label, cleaned_points$V1)
-  trait_tree <- keep.tip(taxonomy_tree, tips_trait)
-  
-  full_neotropics <- monographaR::mapDiversity(cleaned_points, export=T, filename=filename, plot.with.grid = F, plot=T)
-  saveRDS(full_neotropics, file=paste0(filename, ".Rdata"))
-  
-  ### Phyloweight ###
-
-  phylo.weight.rasters <- tmp.raster.list[species.in.common]
-  
-  phylo.weights.fast <- function(phy){
-    tree <- phy
-    Ones <- matrix(1, Ntip(tree), 1)
-    C <- vcv.phylo(tree)
-    phylo.weights <- t(Ones) %*% solve(C) / sum(t(Ones) %*% solve(C))
-    return(phylo.weights)
-  }
-  tip.weight <- phylo.weights.fast(tree) * 1000
-  n0 <- colnames(tip.weight)
-  tip.weight <- as.numeric(tip.weight)
-  names(tip.weight) <- n0
-  
-  mean.tip.rates$taxon <- sub("_"," ", mean.tip.rates$taxon)
-  tmp.raster.rates <- tmp.raster.list[which(names(tmp.raster.list) %in% mean.tip.rates$taxon)]
-  tip.weight <- tip.weight[names(tmp.raster.rates)]
-  
-  # sp richness pw
-  sp.rich <- tmp.raster.rates
-  for(species_index in 1:length(sp.rich)){
-    tmp.tip.weight = as.numeric(tip.weight[names(sp.rich)[species_index]])
-    values(sp.rich[[species_index]]) <- values(sp.rich[[species_index]]) * tmp.tip.weight
-  }
-  sp.rich <- as.list(calc(stack(sp.rich), sum))
-  names(sp.rich) <- "species_richness_pw"
-}  
-
-  ### Regression
-plot.res <- function(trait_raster, full_raster, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw") {
+# Function to plot residuals from linear regression between rasters 
+### Regression
+plot.res <- function(trait_raster, full_raster, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw", file.name="res") {
   template_background <- full_raster
   template_background[!is.na(template_background)] <- 0
   # set pallete 
@@ -169,7 +123,7 @@ plot.res <- function(trait_raster, full_raster, dir=getwd(), pal.name = "RdBu", 
     plot(template_trait, col=rev(pal[c(1:13,17:30)]), add=T, zlim=c(max.v*-1,max.v))
     data("wrld_simpl")
     plot(wrld_simpl, add=T)
-    writeRaster(template.raster, file = paste0(getwd(),"/", file.name,".tif"), overwrite=TRUE)
+    writeRaster(template_trait, file = paste0(getwd(),"/", file.name,".tif"), overwrite=TRUE)
   return(residuals)
 }  
 
