@@ -6,7 +6,8 @@ library(tidyverse)
 library(raster)
 library(CoordinateCleaner)
 library(ape)
-source("~/Desktop/climbers/neotropical_climbers_functions.R")
+source("C:/Users/patri/Google Drive/Papers/Diversificação/climbers/neotropical_climbers_functions.R") 
+      # source das funçoes q vamos usar
 
 # First get grid cell values from filtered GBIF data 
 ####
@@ -23,9 +24,11 @@ source("~/Desktop/climbers/neotropical_climbers_functions.R")
 # save.gbif.neotropics(full_list)
 
 ##############
-climbers_dir <- "~/Desktop/climbers" # Repo 
+climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversificação/climbers" # Repo 
 setwd(climbers_dir)
-full_list <- fread(file.choose()) ## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. NÃƒO COLOCAR ESSE ARQUIVO NO REPO
+full_list <- fread(file.choose()) 
+## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. 
+## NÃO COLOCAR ESSE ARQUIVO NO REPO
 full_list <- full_list[,-1]
 
 full_map <- run.mapDiversity.neotropics(full_list)
@@ -63,10 +66,52 @@ names(rasters) <- rasters.names
   
 full_map <- readRDS("full_neotropical_diversity.Rdata")
 mechanism1 <- readRDS("Mechanism_1.Rdata")
+mechanism2 <- readRDS("Mechanism_2.Rdata")
+mechanism3 <- readRDS("Mechanism_3.Rdata")
+mechanism4 <- readRDS("Mechanism_4.Rdata")
+mechanism5 <- readRDS("Mechanism_5.Rdata")
+mechanism6 <- readRDS("Mechanism_6.Rdata")
+mechanism7 <- readRDS("Mechanism_7.Rdata")
+mechanism8 <- readRDS("Mechanism_8.Rdata")
 
-### residuals
+### residuals (não sei fazer loops entao copiei tudo varias vezes haha)
+    ## tudo bem, plotamos os residuals. mas como calcular estatisticamente pra cada gridcell onde
+    ## tem mais/menos spp do que o esperado? e a escala está em quê?
+pdf("res_mechanism1.pdf", height=5, width=8)
 plot.res(mechanism1, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
 
+pdf("res_mechanism2.pdf", height=5, width=8)
+plot.res(mechanism2, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism3.pdf", height=5, width=8)
+plot.res(mechanism3, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism4.pdf", height=5, width=8)
+plot.res(mechanism4, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism1.pdf", height=5, width=8)
+plot.res(mechanism1, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism5.pdf", height=5, width=8)
+plot.res(mechanism5, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism6.pdf", height=5, width=8)
+plot.res(mechanism6, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism7.pdf", height=5, width=8)
+plot.res(mechanism7, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
+
+pdf("res_mechanism8.pdf", height=5, width=8)
+plot.res(mechanism8, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+dev.off()
 # adicionar coisas
 
 # corrected for PW
@@ -75,7 +120,11 @@ phy <- phy.list(input.dir=climbers_dir, names="GBMB", search.for=".taxized.tre")
 # Substitui "_" por " "
 phy$tip.label <- gsub("_"," ",phy$tip.label)
 # lista de pontos com os nomes que tem na arvore e arvore com tips que tem na lista de pontos
-data <- mech_points[mech_points$species %in% phy$tip.label,]
+   ## mas tenho que fazer isso então pra cada um dos mechs?
+data <- mech_points[mech_points$species %in% phy$tip.label,] 
+# não consegue gerar 'data' pq 'mech_points' é gerado no loop lá em cima, 
+# o ultimo mech_points é do mech 8 q nao tem quase nada
+
 phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
 
 mapDiversity.pw(data, phy)
