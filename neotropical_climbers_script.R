@@ -6,8 +6,10 @@ library(tidyverse)
 library(raster)
 library(CoordinateCleaner)
 library(ape)
-source("C:/Users/patri/Google Drive/Papers/Diversificação/climbers/neotropical_climbers_functions.R") 
-      # source das funçoes q vamos usar
+
+
+source("neotropical_climbers_functions.R") 
+      # source das fun?oes q vamos usar
 
 # First get grid cell values from filtered GBIF data 
 ####
@@ -24,11 +26,11 @@ source("C:/Users/patri/Google Drive/Papers/Diversificação/climbers/neotropical_c
 # save.gbif.neotropics(full_list)
 
 ##############
-climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversificação/climbers" # Repo 
+climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers" # Repo 
 setwd(climbers_dir)
 full_list <- fread(file.choose()) 
 ## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. 
-## NÃO COLOCAR ESSE ARQUIVO NO REPO
+## N?O COLOCAR ESSE ARQUIVO NO REPO
 full_list <- full_list[,-1]
 
 full_map <- run.mapDiversity.neotropics(full_list)
@@ -74,9 +76,9 @@ mechanism6 <- readRDS("Mechanism_6.Rdata")
 mechanism7 <- readRDS("Mechanism_7.Rdata")
 mechanism8 <- readRDS("Mechanism_8.Rdata")
 
-### residuals (não sei fazer loops entao copiei tudo varias vezes haha)
+### residuals (n?o sei fazer loops entao copiei tudo varias vezes haha)
     ## tudo bem, plotamos os residuals. mas como calcular estatisticamente pra cada gridcell onde
-    ## tem mais/menos spp do que o esperado? e a escala está em quê?
+    ## tem mais/menos spp do que o esperado? e a escala est? em qu??
 pdf("res_mechanism1.pdf", height=5, width=8)
 plot.res(mechanism1, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
 dev.off()
@@ -120,12 +122,23 @@ phy <- phy.list(input.dir=climbers_dir, names="GBMB", search.for=".taxized.tre")
 # Substitui "_" por " "
 phy$tip.label <- gsub("_"," ",phy$tip.label)
 # lista de pontos com os nomes que tem na arvore e arvore com tips que tem na lista de pontos
-   ## mas tenho que fazer isso então pra cada um dos mechs?
-data <- mech_points[mech_points$species %in% phy$tip.label,] 
-# não consegue gerar 'data' pq 'mech_points' é gerado no loop lá em cima, 
-# o ultimo mech_points é do mech 8 q nao tem quase nada
+   ## mas tenho que fazer isso ent?o pra cada um dos mechs?
 
-phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
-
-mapDiversity.pw(data, phy)
+#mech_list <- list()
+for(mechanism_index in 1:8) {
+  # Select mechanism
+  mech <- climbers$Species[climbers$CM==mechanism_index]
+  # Taxize names
+  mech_taxized <- gbif.taxize(mech)
+  # Get points from full list
+  mech_points <- subset(full_list, full_list$species %in% as.character(mech_taxized))
+  #mech_list[[mechanism_index]] <- mech_points
+  #mech_points <- mech_list[[1]]
+  ##
+  data <- mech_points[mech_points$species %in% phy$tip.label,] 
+  # n?o consegue gerar 'data' pq 'mech_points' ? gerado no loop l? em cima, 
+  # o ultimo mech_points ? do mech 8 q nao tem quase nada
+  phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
+  mapDiversity.pw(data, phy)
+}
 
