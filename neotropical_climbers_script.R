@@ -26,7 +26,7 @@ source("neotropical_climbers_functions.R")
 # save.gbif.neotropics(full_list)
 
 ##############
-climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers" # Repo 
+climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversificação/climbers" # Repo 
 setwd(climbers_dir)
 full_list <- fread(file.choose()) 
 ## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. 
@@ -124,7 +124,7 @@ phy$tip.label <- gsub("_"," ",phy$tip.label)
 # lista de pontos com os nomes que tem na arvore e arvore com tips que tem na lista de pontos
    ## mas tenho que fazer isso ent?o pra cada um dos mechs?
 
-#mech_list <- list()
+mech_list <- list()
 for(mechanism_index in 1:8) {
   # Select mechanism
   mech <- climbers$Species[climbers$CM==mechanism_index]
@@ -132,13 +132,12 @@ for(mechanism_index in 1:8) {
   mech_taxized <- gbif.taxize(mech)
   # Get points from full list
   mech_points <- subset(full_list, full_list$species %in% as.character(mech_taxized))
-  #mech_list[[mechanism_index]] <- mech_points
-  #mech_points <- mech_list[[1]]
   ##
   data <- mech_points[mech_points$species %in% phy$tip.label,] 
-  # n?o consegue gerar 'data' pq 'mech_points' ? gerado no loop l? em cima, 
-  # o ultimo mech_points ? do mech 8 q nao tem quase nada
-  phy <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
-  mapDiversity.pw(data, phy)
+  phy_temp <- keep.tip(phy, which(phy$tip.label %in% unique(data$species)))
+  mech_list[[mechanism_index]] <- mapDiversity.pw(data, phy_temp)
 }
+  # IT WORKED! *-*
+  # mas os mapas estao sem o delineamento dos paises, tenho q ver como coloca
 
+saveRDS(mech_list,file="mech_list.Rdata")
