@@ -1,4 +1,5 @@
-setwd("C:/Users/patri/Google Drive/Papers/Diversificação/climbers")
+# setwd("~/Desktop/climbers")
+setwd("C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers")
 getwd()
 
 library(phytools)
@@ -18,6 +19,7 @@ library(tidyverse)
 library(taxize)
 
   ## creating a list of only the genera of neotropical climbers
+climbers <- read.csv("climber_database.csv", stringsAsFactors = F)
 x<-as.data.frame(climbers[,2])
 genera2<-as.character(x[!duplicated(x$`climbers[, 2]`), ]) #this thing between '' is the name of the column
 
@@ -75,7 +77,40 @@ sources$title
 
 h<-as.data.frame(taxize::gnr_resolve(names="Justicia sphaerosperma", data_source_ids=sources$id[sources$title == "The International Plant Names Index"], 
                     best_match_only=FALSE))
-            ## esse names=x é um nome de espécie por vez, dá pra fazer um loop iterando pra uma lista de nomes
+            ## esse names=x ? um nome de esp?cie por vez, d? pra fazer um loop iterando pra uma lista de nomes
     # $matched_name
 ?gnr_resolve()
 h<-gnr_resolve(names = c("Asteraceae", "Plantae"))
+
+
+#-----------------------
+# getting age of stem and crown node
+
+# load tree
+s_b_tree <- readRDS("treegenera.RDS")
+example <- "Justicia"
+
+get.node.age <- function (phy) {
+  root.node <- length(phy$tip.label)+1
+  seq.nodes <- phy$edge
+  dists <- phy$edge.length
+  res <- numeric(max(phy$edge))
+  for (i in seq_len(nrow(seq.nodes))) {
+    res[seq.nodes[i, 2]] <- res[seq.nodes[i,1]] + dists[i]
+  }
+  ages <- abs(round(res,3)-round(max(res),3))
+  return(ages)
+}
+
+
+library(phangorn)
+
+tip_numbers <- grep(example, s_b_tree$tip.label)
+crown_node <- mrca.phylo(s_b_tree, tip_numbers)
+stem_node <- Ancestors(s_b_tree, crown_node, type = "parent")
+crown_age <- get.node.age(s_b_tree)[crown_node]
+stem_age <- get.node.age(s_b_tree)[stem_node]
+
+
+
+
