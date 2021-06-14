@@ -45,6 +45,8 @@ get.node.age <- function (phy) {
 } # funçao pra pegar os node ages
 
 genera <- as.character(sppclimbers_recount[,1])
+#saveRDS(sppclimbers_recount, file = "sppclimbers.Rdata")
+
 results <- matrix(nrow=length(genera),ncol=3)
 # tem generos no genera q nao estao amostrados na tree, 
 # fazer um if else pra pular pro proximo qdo encontrar 
@@ -90,6 +92,10 @@ beep("mario")
 colnames(results)<-c("Genus", "Crown Age","Stem Age")
 #as.data.frame(results)
 saveRDS(results, file = "crown_stem_ages.Rdata")
+
+  # criar mais uma coluna com o numero total de spp de cada genero
+  # criar outra coluna dizendo qual grande grupo (monocots, asteridae, etc)
+  # criar outra coluna com o mecanismo de escalada de cada genero
 
 ######### funçoes do phangorn
 tree2 <- rtree(10)
