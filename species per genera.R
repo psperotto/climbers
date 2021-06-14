@@ -17,6 +17,7 @@ library(beepr)
 library(tidyverse)
 library(taxize)
 
+
   ## creating a list of only the genera of neotropical climbers
 x<-as.data.frame(climbers[,2])
 genera2<-as.character(x[!duplicated(x$`climbers[, 2]`), ]) #this thing between '' is the name of the column
@@ -73,9 +74,10 @@ saveRDS(tree, file="treegenera.RDS")
 sources <- taxize::gnr_datasources()
 sources$title
 
-h<-as.data.frame(taxize::gnr_resolve(names="Justicia sphaerosperma", data_source_ids=sources$id[sources$title == "The International Plant Names Index"], 
+h<-as.data.frame(taxize::gnr_resolve(names="Justicia schomburgkiana", data_source_ids=sources$id[sources$title == "The International Plant Names Index"], 
                     best_match_only=FALSE))
             ## esse names=x é um nome de espécie por vez, dá pra fazer um loop iterando pra uma lista de nomes
     # $matched_name
-?gnr_resolve()
-h<-gnr_resolve(names = c("Asteraceae", "Plantae"))
+?gnr_resolve() #but this function doesn't seem to give me the accepted names back... it just seems if they exist at all, from what i understood.
+h<-gnr_resolve(names = c("Justicia schomburgkiana"))
+
