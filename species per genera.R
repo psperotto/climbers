@@ -76,14 +76,15 @@ saveRDS(tree, file="treegenera.RDS")
 sources <- taxize::gnr_datasources()
 sources$title
 
-h<-as.data.frame(taxize::gnr_resolve(names="Justicia schomburgkiana", data_source_ids=sources$id[sources$title == "The International Plant Names Index"], 
+h<-as.data.frame(taxize::gnr_resolve(names="Justicia schomburgkiana", 
+                    data_source_ids=sources$id[sources$title == "The International Plant Names Index"], 
                     best_match_only=FALSE))
             ## esse names=x ? um nome de esp?cie por vez, d? pra fazer um loop iterando pra uma lista de nomes
     # $matched_name
-<<<<<<< HEAD
+#<<<<<<< HEAD
 ?gnr_resolve() #but this function doesn't seem to give me the accepted names back... it just seems if they exist at all, from what i understood.
 h<-gnr_resolve(names = c("Justicia schomburgkiana"))
-=======
+#=======
 ?gnr_resolve()
 h<-gnr_resolve(names = c("Asteraceae", "Plantae"))
 
@@ -118,5 +119,5 @@ stem_age <- get.node.age(s_b_tree)[stem_node]
 
 
 
->>>>>>> c299bc09cb136f5399468ec9c13152886c834329
+#>>>>>>> c299bc09cb136f5399468ec9c13152886c834329
 

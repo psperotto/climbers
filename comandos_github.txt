@@ -1,3 +1,4 @@
+git status pra conferir o que foi modificado
 git pull pra puxar as coisas do github
 git add . pra adicionar as mudanças
 git commit -m "blabla" pra dar o cmmit
