@@ -45,7 +45,7 @@ sppall<-as.data.frame(table(unlist(x$Genus)))
 
 colnames(sppall)<-c("Genus", "Nr")
 saveRDS(sppall, file="sppall.Rdata")
-#sppall<-readRDS(file="sppall.Rdata")
+sppall<-readRDS(file="sppall.Rdata")
 
 # finding the genera in sppall but not in sppclimbers
 z<-sppall$Genus %in% sppclimbers$Genus
@@ -177,7 +177,17 @@ results2<-cbind(results,sppall3$Nr)
 colnames(results2)[4]<-"Nr"
 
 saveRDS(results2, file = "partialresults.Rdata")
+results2<-readRDS(file="partialresults.Rdata")
 
+
+a<-sppall$Genus %in% sppclimbers$Genus
+
+
+mechs<-subset(climbers, Genus==results2$Genus)
+
+unique(climbers$Genus)
+
+  
 # criar mais uma coluna com o numero total de spp de cada genero -> OK!!
 # criar outra coluna dizendo qual grande grupo (monocots, asteridae, rosidae, etc)
 # criar outra coluna com o mecanismo de escalada de cada genero
