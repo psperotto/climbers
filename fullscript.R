@@ -1,4 +1,5 @@
-setwd("C:/Users/patri/Google Drive/Papers/Diversificação/climbers")
+# setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
+setwd("C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers")
 
 # loading packages
 library(lcvplants)
@@ -17,7 +18,7 @@ climbers<-read.csv("climber_database.csv", stringsAsFactors = F)
 # checking status of species with LCVP
 h<-LCVP(climbers$Species)
 beep("mario")
-saveRDS(h,file="LCVP_climbers.Rdata")
+#saveRDS(h,file="LCVP_climbers.Rdata")
 h<-readRDS(file="LCVP_climbers.Rdata")
 
 accepted<-subset(h, Status=="accepted")
@@ -44,7 +45,7 @@ sppall<-as.data.frame(table(unlist(x$Genus)))
       # sppall has 705 genera, how?? try to solve it tomorrow
 
 colnames(sppall)<-c("Genus", "Nr")
-saveRDS(sppall, file="sppall.Rdata")
+#saveRDS(sppall, file="sppall.Rdata")
 sppall<-readRDS(file="sppall.Rdata")
 
 # finding the genera in sppall but not in sppclimbers
@@ -68,6 +69,7 @@ genera75<-subset(percent, perc_NT_spp>=0.75)
 genera75<-genera75[order(genera75$perc_NT_spp, decreasing=T),]
 rownames(genera75)<-c(1:155)
 saveRDS(genera75, file="genera75.Rdata")
+genera75 <- readRDS("genera75.Rdata")
 
 ########## extracting clade/genera ages from S&B 2018 tree #########
 
@@ -110,7 +112,7 @@ get.node.age <- function (phy) {
   }
   ages <- abs(round(res,3)-round(max(res),3))
   return(ages)
-} # funçao pra pegar os node ages
+} # fun?ao pra pegar os node ages
 
 genera<-as.character(genera75$Genus)
 results <- matrix(nrow=length(genera),ncol=3)
@@ -121,9 +123,9 @@ for(i in 1:length(genera)){
   if (length(tip_numbers)==0) {
     results[i,1]<-genera[i]
     results[i,2:3]<-"/"
-    # aqui eu disse q se tip_numbers for um integer de tamanho 0, é pra escrever 
+    # aqui eu disse q se tip_numbers for um integer de tamanho 0, ? pra escrever 
     # o nome do genero e / nas duas colunas -> FUNCIONA!
-    # nos 'if' statements, se a condição não é fulfilled, o loop ignora e segue pro proximo passo
+    # nos 'if' statements, se a condi??o n?o ? fulfilled, o loop ignora e segue pro proximo passo
     next
   } 
   
@@ -157,7 +159,7 @@ beep("mario")
 results<-as.data.frame(results)
 colnames(results)<-c("Genus", "Crown_Age","Stem_Age")
 results<-results[order(results$Genus),]
-results<-subset(results, Stem_Age!="/") # deixando só generos que tem Stem Age
+results<-subset(results, Stem_Age!="/") # deixando s? generos que tem Stem Age
 length(results$Genus) # 119
 rownames(results)<-c(1:119)
 #saveRDS(results, file = "crown_stem_ages.Rdata")
@@ -176,19 +178,26 @@ rownames(sppall3)<-c(1:119)
 results2<-cbind(results,sppall3$Nr)
 colnames(results2)[4]<-"Nr"
 
+
 saveRDS(results2, file = "partialresults.Rdata")
-results2<-readRDS(file="partialresults.Rdata")
 
-
-a<-sppall$Genus %in% sppclimbers$Genus
-
-
-mechs<-subset(climbers, Genus==results2$Genus)
-
-unique(climbers$Genus)
-
-  
 # criar mais uma coluna com o numero total de spp de cada genero -> OK!!
+
 # criar outra coluna dizendo qual grande grupo (monocots, asteridae, rosidae, etc)
 # criar outra coluna com o mecanismo de escalada de cada genero
-
+climbers <- read.csv("climber_database.csv")
+# excluding genera with more than one mechanism
+genera_list <- unique(climbers$Genus)
+to_exclude <- c()
+to_include <- data.frame(matrix(nrow=0,ncol=2))
+for(i in 1:length(genera_list)){
+  subset <- climbers[climbers$Genus==genera_list[i],]
+  if(length(table(subset$CM))==1) {
+    to_include <- rbind(to_include, c(genera_list[i], subset$CM[1]))
+  } else {
+    to_exclude <- c(to_exclude, genera_list[i]) 
+  }
+}
+print(to_exclude) #check those to exclude
+colnames(to_include) <- c("Genus","CM")
+table_final <- merge(results2, to_include, by="Genus")
