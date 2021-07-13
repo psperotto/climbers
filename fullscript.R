@@ -9,6 +9,7 @@ library(ape)
 library(dplyr)
 library(arsenal)
 library(tidyverse)
+library(geiger)
 
 ########## preparing the data ##########
 
@@ -181,7 +182,6 @@ colnames(results2)[4]<-"Nr"
 
 saveRDS(results2, file = "partialresults.Rdata")
 
-# criar mais uma coluna com o numero total de spp de cada genero -> OK!!
 
 # criar outra coluna dizendo qual grande grupo (monocots, asteridae, rosidae, etc)
 # criar outra coluna com o mecanismo de escalada de cada genero
@@ -201,3 +201,42 @@ for(i in 1:length(genera_list)){
 print(to_exclude) #check those to exclude
 colnames(to_include) <- c("Genus","CM")
 table_final <- merge(results2, to_include, by="Genus")
+
+########## calculando net.div ##########
+# library(geiger)
+
+net_div<-data.frame(matrix(nrow=length(table_final$Genus),ncol=4))
+for (i in 1:length(table_final$Genus)) {
+  net_div[i,1]<-table_final$Genus[i]
+  net_div[i,2]<-bd.ms(phy=NULL, time = as.numeric(table_final[i,3]), 
+                      n = as.numeric(table_final[i,4]),crown=F, epsilon = 0)
+  net_div[i,3]<-bd.ms(phy=NULL, time = as.numeric(table_final[i,3]), 
+                      n = as.numeric(table_final[i,4]),crown=F, epsilon = 0.5)
+  net_div[i,4]<-bd.ms(phy=NULL, time = as.numeric(table_final[i,3]), 
+                      n = as.numeric(table_final[i,4]),crown=F, epsilon = 0.9)
+  }
+colnames(net_div)<-c("Genus","e=0","e=0.5","e=0.9")
+#saveRDS(net_div,file="net_div.Rdata")
+
+# calculando limites de stem age com CI=95%
+limits<-data.frame(matrix(nrow=length(table_final$Genus),ncol=7))
+for (i in 1:length(table_final$Genus)){
+  limits[i,1]<-table_final$Genus[i]
+  limits[i,2]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,2], epsilon = 0, CI=.95)[1]
+  limits[i,3]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,2], epsilon = 0, CI=.95)[2]
+  limits[i,4]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,3], epsilon = 0.5, CI=.95)[1]
+  limits[i,5]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,3], epsilon = 0.5, CI=.95)[2]
+  limits[i,6]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,4], epsilon = 0.9, CI=.95)[1]
+  limits[i,7]<-stem.limits(time = as.numeric(table_final[i,3]), 
+                           r=net_div[i,4], epsilon = 0.9, CI=.95)[2]
+}
+colnames(limits)<-c("Genus","lb_0","ub_0","lb_0.5","ub_0.5","lb_0.9","ub_0.9")
+#saveRDS(limits,file="stem_ages_CI95.Rdata")
+
+
+
