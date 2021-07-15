@@ -274,5 +274,5 @@ for (i in 1:length(table_final$Genus)){
 colnames(limits)<-c("Genus","lb_0","ub_0","lb_0.5","ub_0.5","lb_0.9","ub_0.9")
 #saveRDS(limits,file="stem_ages_CI95.Rdata")
 
-
+## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
 
