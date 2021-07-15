@@ -1,5 +1,5 @@
 # setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
-setwd("C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers")
+setwd("C:/Users/patri/Google Drive/Papers/Diversificação/climbers")
 
 # loading packages
 library(lcvplants)
@@ -178,14 +178,11 @@ rownames(sppall3)<-c(1:119)
 # colar a coluna 'Nr' de sppall3 com results
 results2<-cbind(results,sppall3$Nr)
 colnames(results2)[4]<-"Nr"
+#saveRDS(results2, file = "partialresults.Rdata")
 
-
-saveRDS(results2, file = "partialresults.Rdata")
-
-
-# criar outra coluna dizendo qual grande grupo (monocots, asteridae, rosidae, etc)
-# criar outra coluna com o mecanismo de escalada de cada genero
+# criar outra coluna com o mecanismo de escalada de cada genero #
 climbers <- read.csv("climber_database.csv")
+
 # excluding genera with more than one mechanism
 genera_list <- unique(climbers$Genus)
 to_exclude <- c()
@@ -202,9 +199,48 @@ print(to_exclude) #check those to exclude
 colnames(to_include) <- c("Genus","CM")
 table_final <- merge(results2, to_include, by="Genus")
 
+# criar coluna dizendo qual grande grupo (monocots, asteridae, rosidae, etc) #
+orders<-accepted$Genus %in% table_final$Genus
+orders<-as.numeric(which(orders==T))
+orders<-accepted[orders,]
+orders<-distinct(orders,Genus,.keep_all = T)
+orders<-orders[,c("Order","Genus")]
+orders<-orders[order(orders$Genus),]
+rownames(orders)<-c(1:117)
+orders<-orders %>% add_column(Group =NA)
+
+for (i in 1:length(orders$Order)) {
+  if (orders[i,1]=="Piperales"){
+    orders[i,3]<-"Magnoliids"
+    next
+  }
+  if (orders[i,1]==c("Alismatales", "Asparagales", "Pandanales")){
+    orders[i,3]<-"Monocots"
+    next
+  }
+  if (orders[i,1]==c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")){
+    orders[i,3]<-"Rosids"
+    next
+  }
+  if (orders[i,1]==c("Gentianales","Asterales","Lamiales","Ericales","Cornales","Solanales","Icacinales")){
+    orders[i,3]<-"Asterids"
+    next
+  }  
+  if (orders[i,1]==c("Dilleniales","Caryophyllales","Ranunculales")){
+    orders[i,3]<-"Other"
+  }
+}
+## this is not working and i don't know why :((((((  ##
+
+
+class(orders$Order)
+
+a<-unique(orders$Order)
+
+
+
 ########## calculando net.div ##########
 # library(geiger)
-
 net_div<-data.frame(matrix(nrow=length(table_final$Genus),ncol=4))
 for (i in 1:length(table_final$Genus)) {
   net_div[i,1]<-table_final$Genus[i]
@@ -218,7 +254,7 @@ for (i in 1:length(table_final$Genus)) {
 colnames(net_div)<-c("Genus","e=0","e=0.5","e=0.9")
 #saveRDS(net_div,file="net_div.Rdata")
 
-# calculando limites de stem age com CI=95%
+# calculando limites de stem age com CI=95% #
 limits<-data.frame(matrix(nrow=length(table_final$Genus),ncol=7))
 for (i in 1:length(table_final$Genus)){
   limits[i,1]<-table_final$Genus[i]

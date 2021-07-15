@@ -1,0 +1,16 @@
+Magnoliids
+"Piperales"
+
+Monocots
+c("Alismatales", "Asparagales", "Pandanales")
+
+Rosids
+c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")
+
+
+Asterids
+c("Gentianales","Asterales","Lamiales","Ericales","Cornales","Solanales","Icacinales")
+
+
+Other
+c("Dilleniales","Caryophyllales","Ranunculales") 
