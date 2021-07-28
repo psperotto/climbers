@@ -214,30 +214,24 @@ for (i in 1:length(orders$Order)) {
     orders[i,3]<-"Magnoliids"
     next
   }
-  if (orders[i,1]==c("Alismatales", "Asparagales", "Pandanales")){
+  if (orders[i,1] %in% c("Alismatales", "Asparagales", "Pandanales")==T){
     orders[i,3]<-"Monocots"
     next
   }
-  if (orders[i,1]==c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")){
+  if (orders[i,1] %in% c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")==T){
     orders[i,3]<-"Rosids"
     next
   }
-  if (orders[i,1]==c("Gentianales","Asterales","Lamiales","Ericales","Cornales","Solanales","Icacinales")){
+  if (orders[i,1] %in% c("Gentianales","Asterales","Lamiales","Ericales","Cornales","Solanales","Icacinales")==T){
     orders[i,3]<-"Asterids"
     next
   }  
-  if (orders[i,1]==c("Dilleniales","Caryophyllales","Ranunculales")){
+  if (orders[i,1] %in%  c("Dilleniales","Caryophyllales","Ranunculales")==T){
     orders[i,3]<-"Other"
   }
 }
-## this is not working and i don't know why :((((((  ##
-
-
-class(orders$Order)
-
-a<-unique(orders$Order)
-
-
+# it worked!
+ #use rbind
 
 ########## calculando net.div ##########
 # library(geiger)
@@ -274,5 +268,20 @@ for (i in 1:length(table_final$Genus)){
 colnames(limits)<-c("Genus","lb_0","ub_0","lb_0.5","ub_0.5","lb_0.9","ub_0.9")
 #saveRDS(limits,file="stem_ages_CI95.Rdata")
 
-## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
+###### graficos Magallon & Sanderson ####
 
+table <- data.frame(taxa=table_final$Genus,
+                       diversity=table_final$Nr,
+                       node=c("SG"),
+                       age_mean=table_final$Stem_Age,
+                       stringsAsFactors = FALSE)
+
+#teste com ages of angiosperms, monocots, etc#
+b<-data.frame(taxa=c("bg_clade","Monocots", "Rosids", "Asterids"),
+              diversity=c(295383,74273,10,10),
+              node=c("CG","SG","SG","SG"),
+              age_mean=c(209, 154,130,125),
+              stringsAsFactors = FALSE)
+table<-rbind(b,table)
+## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
+# possible mean ages of angiosperm crown nodes: Magallon et al. 2015: 139.4 ; Li et al. 2019: 209 myr
