@@ -278,9 +278,9 @@ table <- data.frame(taxa=table_final$Genus,
 
 #teste com ages of angiosperms, monocots, etc#
 b<-data.frame(taxa=c("bg_clade","Monocots", "Rosids", "Asterids"),
-              diversity=c(295383,74273,10,10),
+              diversity=c(295383,74273,10,10), # procurar o numero real de spp de rosids e asterids
               node=c("CG","SG","SG","SG"),
-              age_mean=c(209, 154,130,125),
+              age_mean=c(209, 154, 130,125), # mudar esses valores depois de determinar as idades correta a serem usadas
               stringsAsFactors = FALSE)
 table<-rbind(b,table)
 ## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
