@@ -1,5 +1,5 @@
 # setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
-setwd("C:/Users/patri/Google Drive/Papers/Diversificação/climbers")
+setwd("G:/Meu Drive/Papers/Diversificação/climbers")
 
 # loading packages
 library(lcvplants)
@@ -285,3 +285,7 @@ b<-data.frame(taxa=c("bg_clade","Monocots", "Rosids", "Asterids"),
 table<-rbind(b,table)
 ## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
 # possible mean ages of angiosperm crown nodes: Magallon et al. 2015: 139.4 ; Li et al. 2019: 209 myr
+
+write.csv(table, file = "table.csv")
+
+table$age_mean<-as.numeric(table$age_mean) # yaaaay :D

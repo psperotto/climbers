@@ -1,3 +1,5 @@
+setwd("G:/Meu Drive/Papers/Diversificação/climbers")
+
 # rm(list=ls())
 ## Script and functions to plot Magallon and Sanderson comparison
 get.tail.probs <- function (table=table) {
