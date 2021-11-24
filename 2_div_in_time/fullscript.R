@@ -1,5 +1,5 @@
 # setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
-setwd("G:/Meu Drive/Papers/Diversificação/climbers")
+setwd("G:/Meu Drive/Papers/Diversifica??o/climbers")
 
 # loading packages
 library(lcvplants)
@@ -11,22 +11,28 @@ library(arsenal)
 library(tidyverse)
 library(geiger)
 
-########## preparing the data ##########
+#------------------------------- checkpoint
+################################
+# Preparing the data ##########
+################################
 
 # reading the data
-climbers<-read.csv("climber_database.csv", stringsAsFactors = F)
+climbers <- read.csv("climber_database.csv", stringsAsFactors = F)
 
 # checking status of species with LCVP
-h<-LCVP(climbers$Species)
+h <- LCVP(climbers$Species)
 beep("mario")
-#saveRDS(h,file="LCVP_climbers.Rdata")
-h<-readRDS(file="LCVP_climbers.Rdata")
+# saveRDS(h,file="LCVP_climbers.Rdata")
 
-accepted<-subset(h, Status=="accepted")
-problems<-subset(h, Status!="accepted")
+
+#------------------------------- checkpoint
+h <- readRDS(file="LCVP_climbers.Rdata")
+
+accepted <- subset(h, Status=="accepted")
+problems <- subset(h, Status!="accepted")
 
 # counting genera of climbers
-genera<-unique(accepted$Genus) # 689 generos, 100 a menos que o database original...
+genera <- unique(accepted$Genus) # 689 generos, 100 a menos que o database original...
 
 # counting species of NT climbers in every genus
 sppclimbers<-as.data.frame(table(unlist(accepted$Genus)))
@@ -40,24 +46,26 @@ for (i in 1:length(genera))  {
 beep("mario")
 
 # glueing together all species for every genus of climbers and counting them
-x<-do.call(rbind,list)
-x<-subset(x, Status=="accepted")
+x <- do.call(rbind,list)
+x <- subset(x, Status=="accepted")
 sppall<-as.data.frame(table(unlist(x$Genus)))
       # sppall has 705 genera, how?? try to solve it tomorrow
 
 colnames(sppall)<-c("Genus", "Nr")
 #saveRDS(sppall, file="sppall.Rdata")
-sppall<-readRDS(file="sppall.Rdata")
+
+#------------------------------- checkpoint
+sppall <- readRDS(file="sppall.Rdata")
 
 # finding the genera in sppall but not in sppclimbers
-z<-sppall$Genus %in% sppclimbers$Genus
-z<-as.numeric(which(z==F))
+z <- sppall$Genus %in% sppclimbers$Genus
+z <- as.numeric(which(z==F))
 
 # excluding these genera from sppall
-sppall2<-sppall[-z,]
-sppall2<-sppall2[order(sppall2$Genus),]
-rownames(sppall2)<-c(1:689)
-sppclimbers<-sppclimbers[order(sppclimbers$Genus),]
+sppall2 <- sppall[-z,]
+sppall2 <- sppall2[order(sppall2$Genus),]
+rownames(sppall2) <- c(1:689)
+sppclimbers <- sppclimbers[order(sppclimbers$Genus),]
 
 ########## choosing which genera will be included in the analysis ##########
 
@@ -69,7 +77,9 @@ colnames(percent)<-c("Genus","perc_NT_spp")
 genera75<-subset(percent, perc_NT_spp>=0.75)
 genera75<-genera75[order(genera75$perc_NT_spp, decreasing=T),]
 rownames(genera75)<-c(1:155)
-saveRDS(genera75, file="genera75.Rdata")
+#saveRDS(genera75, file="genera75.Rdata")
+
+#------------------------------- checkpoint
 genera75 <- readRDS("genera75.Rdata")
 
 ########## extracting clade/genera ages from S&B 2018 tree #########
@@ -78,8 +88,8 @@ genera75 <- readRDS("genera75.Rdata")
 tree <- read.tree(file="GBMB.tre")
 
 # renaming the tips of the tree to contain only the genus
-n<-tree$tip.label
-n<-strsplit(n,"_") #n is a list
+n <- tree$tip.label
+n <- strsplit(n,"_") #n is a list
 
 # selecting only the first object in the vectors within the list 
 list<-list()
@@ -97,6 +107,7 @@ tree$tip.label<-list
 # saving the tree with only genera as tips
 saveRDS(tree, file="treegenera.RDS")
 
+#------------------------------- checkpoint
 # getting age of stem and crown node
 treegenera <- readRDS("treegenera.RDS")
 

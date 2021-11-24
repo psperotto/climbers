@@ -1,4 +1,5 @@
-setwd("G:/Meu Drive/Papers/Diversificação/climbers")
+# setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
+setwd("G:/Meu Drive/Papers/Diversifica??o/climbers")
 
 # rm(list=ls())
 ## Script and functions to plot Magallon and Sanderson comparison
@@ -402,7 +403,7 @@ example <- get.template(save.file=F)
 
 ######## PLOT FIG 3 & 4 ######
 
-results <- get.tail.probs(table=table)
+results <- get.tail.probs(table=example)
 # save(results, file="test.Rsave")
 
 pdf(file="plot.tail.probs.pdf", height=6, width=8)
