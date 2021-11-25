@@ -37,13 +37,9 @@ all_Rdata <- list.files(data_dir)[grep(".Rdata", list.files(data_dir))]
 all_mechs <- all_Rdata[grep("Mechanism", all_Rdata)]
 mech_maps <- lapply(paste0(data_dir, "/", all_mechs), readRDS)
 
-
-
-  #template.map <- readRDS("Data/template.map.Rdata")
-  template.map <- all_neotropical
-  template.map[!is.na(template.map[])] <- 0
-
-  tmp.raster.list <- list()
+template.map <- all_neotropical
+template.map[!is.na(template.map[])] <- 0
+tmp.raster.list <- list()
   for (i in 1:length(mech_maps)) {
     r1 <- mech_maps[[i]]
     r1 <- raster::resample(r1, template.map)

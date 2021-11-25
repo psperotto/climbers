@@ -1,4 +1,6 @@
 # Diversification of Neotropical climbers across space and time
+# setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
+# setwd("C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers") # Repo 
 
 library(data.table)
 library(monographaR)
@@ -6,42 +8,39 @@ library(tidyverse)
 library(raster)
 library(CoordinateCleaner)
 library(ape)
-
+library(maptools)
+data("wrld_simpl")
 
 source("neotropical_climbers_functions.R") 
       # source das funcoes q vamos usar
 
 # First get grid cell values from filtered GBIF data 
-####
 #### from TV local
-# gbif_dir <- "~/Desktop/full_gbif_quest/" 
-# gbif_files <- list.files(paste0(gbif_dir, "z_filtered_gbif"), ".csv")
-# full_list <- read.full.gbif(gbif_files, gbif_dir)
-# write.csv(full_list, file=paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
+ gbif_dir <- paste0(getwd(), "/full_gbif_quest")
+ gbif_files <- list.files(paste0(gbif_dir, "/z_filtered_gbif"), ".csv")
+ full_list <- read.full.gbif(gbif_files, gbif_dir)
+ write.csv(full_list, file=paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
 
 # load table back
-# setwd(gbif_dir)
-# full_list <- fread(paste0(gbif_dir, "full_tracheophyte_filtered_gbif.csv"))
-# full_list <- full_list[,-1]
-# save.gbif.neotropics(full_list)
+ full_list <- fread(paste0(gbif_dir, "/full_tracheophyte_filtered_gbif.csv"))
+ full_list <- full_list[,-1]
+ save.gbif.neotropics(full_list)
 
 ##############
-climbers_dir <- "C:/Users/patri/Google Drive/Papers/Diversifica??o/climbers" # Repo 
-setwd(climbers_dir)
-full_list <- fread(file.choose()) 
-## Procurar "neotropics_tracheophyte_filtered_gbif.csv" no computador. 
-## N?O COLOCAR ESSE ARQUIVO NO REPO
+# Directory for descriptive results
+descriptive_dir <- paste0(getwd(), "/1_descriptive")
+   
+full_list <- fread(paste0(gbif_dir, "/neotropics_tracheophyte_filtered_gbif.csv"))
 full_list <- full_list[,-1]
+full_map <- run.mapDiversity.neotropics(full_list, filename="full_neotropical_diversity", dir=descriptive_dir) # function modified from monographaR
 
-full_map <- run.mapDiversity.neotropics(full_list)
-
-pdf("all_angio_div.pdf", height=8, width=5)
+# Plot
+pdf(paste0(descriptive_dir,"/full_neotropical_diversity.pdf"), height=8, width=5)
 plot(full_map)
 dev.off()
 
-# load table with climbers
-
-climbers <- read.csv("climber_database.csv", stringsAsFactors = F)
+# Now load table climbers
+climbers <- read.csv("Data/climber_database.csv", stringsAsFactors = F)
 
 # Make map of grid cell diversity for each of the 8 mechanisms
 for(mechanism_index in 1:8) {
@@ -51,34 +50,46 @@ for(mechanism_index in 1:8) {
   mech_taxized <- gbif.taxize(mech)
   # Get points from full list
   mech_points <- subset(full_list, full_list$species %in% as.character(mech_taxized))
+  saveRDS(mech_points, file=paste0("Data/","Mechanism_", mechanism_index,"_taxized_points.Rdata"))
   # Get raster of grid cells 
-  mech_map <- run.mapDiversity.neotropics(mech_points, filename=paste0("Mechanism_", mechanism_index))
+  mech_map <- run.mapDiversity.neotropics(mech_points, filename=paste0("Mechanism_", mechanism_index), dir=descriptive_dir)
   # Plot pdf
-  pdf(paste0("Mechanism_", mechanism_index,".pdf"), height=8, width=5)
+  pdf(paste0(descriptive_dir,"/Mechanism_", mechanism_index,".pdf"), height=8, width=5)
   plot(mech_map)
   dev.off()
 }
 
 ###########
 # Load raster back
-rasters <- list.files(climbers_dir, ".Rdata")
+rasters <- list.files(descriptive_dir, ".Rdata")
+rasters <- rasters[grep("Mechanism", rasters)]
 rasters.names <- sub(".Rdata", "", rasters)
-rasters <- lapply(paste0(climbers_dir, "/", rasters), readRDS)
+rasters <- lapply(paste0(descriptive_dir, "/", rasters), readRDS)
 names(rasters) <- rasters.names
   
-full_map <- readRDS("full_neotropical_diversity.Rdata")
-mechanism1 <- readRDS("Mechanism_1.Rdata")
-mechanism2 <- readRDS("Mechanism_2.Rdata")
-mechanism3 <- readRDS("Mechanism_3.Rdata")
-mechanism4 <- readRDS("Mechanism_4.Rdata")
-mechanism5 <- readRDS("Mechanism_5.Rdata")
-mechanism6 <- readRDS("Mechanism_6.Rdata")
-mechanism7 <- readRDS("Mechanism_7.Rdata")
-mechanism8 <- readRDS("Mechanism_8.Rdata")
+full_map <- readRDS("1_descriptive/full_neotropical_diversity.Rdata")
 
-### residuals (n?o sei fazer loops entao copiei tudo varias vezes haha)
-    ## tudo bem, plotamos os residuals. mas como calcular estatisticamente pra cada gridcell onde
-    ## tem mais/menos spp do que o esperado? e a escala est? em qu??
+template.map <- full_map
+template.map[!is.na(template.map[])] <- 0
+
+tmp.raster.list <- list()
+for (i in 1:length(rasters)) {
+  r1 <- rasters[[i]]
+  r1 <- raster::resample(r1, template.map)
+  r1[is.na(r1)] <- 0
+  tmp.raster.list[[i]] <- raster::mask(r1, template.map)
+  print(i)
+}
+sprichness_climbers_map <- raster::calc(raster::stack(tmp.raster.list), sum)
+sprichness_climbers_map <- raster::crop(sprichness_climbers_map, raster::extent(full_map))
+
+#plot(sprichness_climbers_map)
+#plot(wrld_simpl, add=T)
+
+plot.res(sprichness_climbers_map, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
+
+### residuals 
+
 pdf("res_mechanism1.pdf", height=5, width=8)
 plot.res(mechanism1, full_map, dir=getwd(), pal.name = "RdBu", output = "residuals_sprich_pw")
 dev.off()
@@ -116,7 +127,13 @@ plot.res(mechanism8, full_map, dir=getwd(), pal.name = "RdBu", output = "residua
 dev.off()
 # adicionar coisas
 
-# corrected for PW
+
+
+
+# PD and phyloANOVA
+
+
+
 # Carregar a arvore
 phy <- phy.list(input.dir=climbers_dir, names="GBMB", search.for=".taxized.tre")[[1]] 
 # Substitui "_" por " "
