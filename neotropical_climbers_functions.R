@@ -49,10 +49,9 @@ gbif.taxize <- function (species) {
     }
     return(new.name)
   }
-  new.names <- pbapply::pbsapply(species, gnr_resolve_x)
+  new.names <- pbapply::pbsapply(species, gnr_resolve_x, cl=48)
   return(new.names)
 }
-
 
 # (it should also adjust for phylogenetic dependency using phyloweights)
 
@@ -119,12 +118,12 @@ plot.res <- function(trait_raster, full_raster, dir=getwd(), pal.name = "RdBu", 
     teste_pos[teste_pos < 0.001] <- NA
     teste_neg[teste_neg > -0.001] <- NA
     template_trait <- do.call(merge, list(teste_pos, teste_neg))
-    plot(template_background, col=hcl.colors(5, palette = "Light Grays", alpha = 1)[2], legend=FALSE)
+    plot(template_background, col="white", legend=FALSE)
     plot(template_trait, col=rev(pal[c(1:13,17:30)]), add=T, zlim=c(max.v*-1,max.v))
     data("wrld_simpl")
     plot(wrld_simpl, add=T)
     writeRaster(template_trait, file = paste0(getwd(),"/", file.name,".tif"), overwrite=TRUE)
-  return(residuals)
+  return(template_trait)
 }  
 
 ##
