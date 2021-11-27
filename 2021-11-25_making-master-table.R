@@ -5,7 +5,7 @@ source("neotropical_climbers_functions.R")
 # setwd("~/climbers")
 # setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
 
-# Taxize climbers accordinf to GBIF
+# Taxize climbers according to GBIF
 climbers <- read.csv("Data/climber_database.csv", stringsAsFactors = F)
 taxized_climbers <- gbif.taxize(climbers$Species)
 climbers$taxized_names <- taxized_climbers
@@ -60,7 +60,3 @@ full_list$mechanism[which(is.na(full_list$mechanism))] <- "not_a_climber"
 write.csv(full_list, file="full_gbif_quest/master_table.csv", row.names = F)
 
 #table(full_list$mechanism)
-
-
-
-
