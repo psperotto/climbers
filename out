@@ -19,3 +19,6 @@ The following object is masked from ‘package:raster’:
 
     getData
 
+Warning message:
+In parallel::mclapply(X, FUN, ..., mc.cores = as.integer(cl)) :
+  scheduled core 13 encountered error in user code, all values of the job will be affected
