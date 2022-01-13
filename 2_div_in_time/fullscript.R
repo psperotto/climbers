@@ -1,5 +1,6 @@
 # setwd("~/Desktop/Colabs/Patricia_Climbers/climbers")
-setwd("G:/Meu Drive/Papers/Diversifica??o/climbers")
+
+getwd()
 
 # loading packages
 library(lcvplants)
@@ -11,28 +12,23 @@ library(arsenal)
 library(tidyverse)
 library(geiger)
 
-#------------------------------- checkpoint
-################################
-# Preparing the data ##########
-################################
+########## preparing the data ##########
 
 # reading the data
-climbers <- read.csv("climber_database.csv", stringsAsFactors = F)
+# setwd("G:/Meu Drive/Papers/Diversificação/climbers/Data")
+climbers<-read.csv("climber_database.csv", stringsAsFactors = F)
 
-# checking status of species with LCVP
-h <- LCVP(climbers$Species)
+# checking status of species  ##########
+h<-LCVP(climbers$Species)
 beep("mario")
-# saveRDS(h,file="LCVP_climbers.Rdata")
+#saveRDS(h,file="LCVP_climbers.Rdata")
+h<-readRDS(file="LCVP_climbers.Rdata")
 
-
-#------------------------------- checkpoint
-h <- readRDS(file="LCVP_climbers.Rdata")
-
-accepted <- subset(h, Status=="accepted")
-problems <- subset(h, Status!="accepted")
+accepted<-subset(h, Status=="accepted")
+problems<-subset(h, Status!="accepted")
 
 # counting genera of climbers
-genera <- unique(accepted$Genus) # 689 generos, 100 a menos que o database original...
+genera<-unique(accepted$Genus) # 689 generos, 100 a menos que o database original...
 
 # counting species of NT climbers in every genus
 sppclimbers<-as.data.frame(table(unlist(accepted$Genus)))
@@ -46,31 +42,32 @@ for (i in 1:length(genera))  {
 beep("mario")
 
 # glueing together all species for every genus of climbers and counting them
-x <- do.call(rbind,list)
-x <- subset(x, Status=="accepted")
+x<-do.call(rbind,list)
+#x<-subset(x, Status=="accepted")
 sppall<-as.data.frame(table(unlist(x$Genus)))
       # sppall has 705 genera, how?? try to solve it tomorrow
 
 colnames(sppall)<-c("Genus", "Nr")
 #saveRDS(sppall, file="sppall.Rdata")
-
-#------------------------------- checkpoint
-sppall <- readRDS(file="sppall.Rdata")
+sppall<-readRDS(file="sppall.Rdata")
 
 # finding the genera in sppall but not in sppclimbers
-z <- sppall$Genus %in% sppclimbers$Genus
-z <- as.numeric(which(z==F))
+z<-sppall$Genus %in% sppclimbers$Genus
+z<-as.numeric(which(z==F))
+sppall[z,] # mostra os 16 generos que estão em sppall mas não em sppclimbers
 
 # excluding these genera from sppall
-sppall2 <- sppall[-z,]
-sppall2 <- sppall2[order(sppall2$Genus),]
-rownames(sppall2) <- c(1:689)
-sppclimbers <- sppclimbers[order(sppclimbers$Genus),]
+sppall<-sppall[-z,]
+sppall<-sppall[order(sppall$Genus),]
+rownames(sppall)<-c(1:689)
+
+sppclimbers<-sppclimbers[order(sppclimbers$Genus),]
 
 ########## choosing which genera will be included in the analysis ##########
 
+setwd("G:/Meu Drive/Papers/Diversificação/climbers/Data")
 # calculating the proportions
-percent<-data.frame(sppall2$Genus, c(sppclimbers$Nr/sppall2$Nr))
+percent<-data.frame(sppall$Genus, c(sppclimbers$Nr/sppall2$Nr))
 colnames(percent)<-c("Genus","perc_NT_spp")
 
 # selecting only genera with >75%
@@ -78,18 +75,17 @@ genera75<-subset(percent, perc_NT_spp>=0.75)
 genera75<-genera75[order(genera75$perc_NT_spp, decreasing=T),]
 rownames(genera75)<-c(1:155)
 #saveRDS(genera75, file="genera75.Rdata")
-
-#------------------------------- checkpoint
-genera75 <- readRDS("genera75.Rdata")
+genera75.LVCP <- readRDS("genera75.Rdata")
 
 ########## extracting clade/genera ages from S&B 2018 tree #########
 
 # read tree
 tree <- read.tree(file="GBMB.tre")
+x<-as.data.frame(tree$node.label)
 
 # renaming the tips of the tree to contain only the genus
-n <- tree$tip.label
-n <- strsplit(n,"_") #n is a list
+n<-tree$tip.label
+n<-strsplit(n,"_") #n is a list
 
 # selecting only the first object in the vectors within the list 
 list<-list()
@@ -107,7 +103,6 @@ tree$tip.label<-list
 # saving the tree with only genera as tips
 saveRDS(tree, file="treegenera.RDS")
 
-#------------------------------- checkpoint
 # getting age of stem and crown node
 treegenera <- readRDS("treegenera.RDS")
 
@@ -230,15 +225,15 @@ for (i in 1:length(orders$Order)) {
     next
   }
   if (orders[i,1] %in% c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")==T){
-    orders[i,3]<-"Rosids"
+    orders[i,3]<-"Superrosids"
     next
   }
-  if (orders[i,1] %in% c("Gentianales","Asterales","Lamiales","Ericales","Cornales","Solanales","Icacinales")==T){
-    orders[i,3]<-"Asterids"
+  if (orders[i,1] %in% c("Gentianales","Asterales","Dilleniales","Lamiales","Ericales","Cornales","Caryophyllales","Solanales","Icacinales")==T){
+    orders[i,3]<-"Superasterids"
     next
   }  
-  if (orders[i,1] %in%  c("Dilleniales","Caryophyllales","Ranunculales")==T){
-    orders[i,3]<-"Other"
+  if (orders[i,1]=="Ranunculales"){
+    orders[i,3]<-"Ranunculales"
   }
 }
 # it worked!
@@ -246,6 +241,8 @@ for (i in 1:length(orders$Order)) {
 
 ########## calculando net.div ##########
 # library(geiger)
+
+# climber clades #
 net_div<-data.frame(matrix(nrow=length(table_final$Genus),ncol=4))
 for (i in 1:length(table_final$Genus)) {
   net_div[i,1]<-table_final$Genus[i]
@@ -259,44 +256,104 @@ for (i in 1:length(table_final$Genus)) {
 colnames(net_div)<-c("Genus","e=0","e=0.5","e=0.9")
 #saveRDS(net_div,file="net_div.Rdata")
 
+
+
+
 # calculando limites de stem age com CI=95% #
-limits<-data.frame(matrix(nrow=length(table_final$Genus),ncol=7))
-for (i in 1:length(table_final$Genus)){
-  limits[i,1]<-table_final$Genus[i]
-  limits[i,2]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,2], epsilon = 0, CI=.95)[1]
-  limits[i,3]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,2], epsilon = 0, CI=.95)[2]
-  limits[i,4]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,3], epsilon = 0.5, CI=.95)[1]
-  limits[i,5]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,3], epsilon = 0.5, CI=.95)[2]
-  limits[i,6]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,4], epsilon = 0.9, CI=.95)[1]
-  limits[i,7]<-stem.limits(time = as.numeric(table_final[i,3]), 
-                           r=net_div[i,4], epsilon = 0.9, CI=.95)[2]
-}
-colnames(limits)<-c("Genus","lb_0","ub_0","lb_0.5","ub_0.5","lb_0.9","ub_0.9")
+#limits<-data.frame(matrix(nrow=length(table_final$Genus),ncol=7))
+#for (i in 1:length(table_final$Genus)){
+#  limits[i,1]<-table_final$Genus[i]
+#  limits[i,2]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,2], epsilon = 0, CI=.95)[1]
+#  limits[i,3]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,2], epsilon = 0, CI=.95)[2]
+#  limits[i,4]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,3], epsilon = 0.5, CI=.95)[1]
+#  limits[i,5]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,3], epsilon = 0.5, CI=.95)[2]
+#  limits[i,6]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,4], epsilon = 0.9, CI=.95)[1]
+#  limits[i,7]<-stem.limits(time = as.numeric(table_final[i,3]), 
+#                           r=net_div[i,4], epsilon = 0.9, CI=.95)[2]
+#}
+#colnames(limits)<-c("Genus","lb_0","ub_0","lb_0.5","ub_0.5","lb_0.9","ub_0.9")
 #saveRDS(limits,file="stem_ages_CI95.Rdata")
 
 ###### graficos Magallon & Sanderson ####
 
-table <- data.frame(taxa=table_final$Genus,
+a <- data.frame(taxa=table_final$Genus,
                        diversity=table_final$Nr,
                        node=c("SG"),
-                       age_mean=table_final$Stem_Age,
+                       age_mean=as.numeric(table_final$Stem_Age),
                        stringsAsFactors = FALSE)
 
-#teste com ages of angiosperms, monocots, etc#
-b<-data.frame(taxa=c("bg_clade","Monocots", "Rosids", "Asterids"),
-              diversity=c(295383,74273,10,10), # procurar o numero real de spp de rosids e asterids
-              node=c("CG","SG","SG","SG"),
-              age_mean=c(209, 154, 130,125), # mudar esses valores depois de determinar as idades correta a serem usadas
-              stringsAsFactors = FALSE)
-table<-rbind(b,table)
-## quando for fazer os graficos tipo da magallon e sanderson fazer pra angiospermas no geral e tb pros grandes grupos asteridae, rosidae, etc
-# possible mean ages of angiosperm crown nodes: Magallon et al. 2015: 139.4 ; Li et al. 2019: 209 myr
+# teste com ages of angiosperms, monocots, etc #
+b<-data.frame(taxa=c("bg_clade","Magnoliids", "Monocots", "Superrosids", "Superasterids"),
+                   diversity=c(352000,10293,69335,87302, 111856), 
+                   node=c("bg","SG","SG","SG", "SG"),
+                   age_mean=as.numeric(c(325.1, 134.6, 135.8,123.7,123.7)), 
+                   stringsAsFactors = FALSE)
 
+#table<-rbind(b,a) 
 write.csv(table, file = "table.csv")
 
-table$age_mean<-as.numeric(table$age_mean) # yaaaay :D
+# tables for each background clade
+
+bg.ang<-rbind(b[1,],a)
+saveRDS(bg.ang, file="bg.ang.Rdata")
+
+bg.mag<-rbind(b[2,],a)
+bg.mag[1,1]<-"bg_clade"
+bg.mag[1,3]<-"bg"
+saveRDS(bg.mag, file="bg.mag.Rdata")
+
+bg.mon<-rbind(b[3,],a)
+bg.mon[1,1]<-"bg_clade"
+bg.mon[1,3]<-"bg"
+saveRDS(bg.mon, file="bg.mon.Rdata")
+
+bg.sros<-rbind(b[4,],a)
+bg.sros[1,1]<-"bg_clade"
+bg.sros[1,3]<-"bg"
+saveRDS(bg.sros, file="bg.sros.Rdata")
+
+bg.sast<-rbind(b[5,],a)
+bg.sast[1,1]<-"bg_clade"
+bg.sast[1,3]<-"bg"
+saveRDS(bg.sast, file="bg.sast.Rdata")
+
+# lista pra rodar os graficos mais facilmente depois
+bg.clades<-vector(mode = "list", length = 5)
+bg.clades[[1]]<-bg.ang
+bg.clades[[2]]<-bg.mag
+bg.clades[[3]]<-bg.mon
+bg.clades[[4]]<-bg.sros
+bg.clades[[5]]<-bg.sast
+  
+###################só curiosidade ###########
+# net div background clades with crown age #
+net_div.bg_clades.crown<-data.frame(matrix(nrow=length(b.crown$taxa),ncol=4))
+for (i in 1:length(b.crown$taxa)) {
+  net_div.bg_clades.crown[i,1]<-b.crown$taxa[i]
+  net_div.bg_clades.crown[i,2]<-bd.ms(phy=NULL, time = as.numeric(b.crown[i,4]), 
+                      n = as.numeric(b.crown[i,2]),crown=T, epsilon = 0)
+  net_div.bg_clades.crown[i,3]<-bd.ms(phy=NULL, time = as.numeric(b.crown[i,4]), 
+                      n = as.numeric(b.crown[i,2]),crown=T, epsilon = 0.5)
+  net_div.bg_clades.crown[i,4]<-bd.ms(phy=NULL, time = as.numeric(b.crown[i,4]), 
+                      n = as.numeric(b.crown[i,2]),crown=T, epsilon = 0.9)
+}
+colnames(net_div.bg_clades.crown)<-c("clade","e=0","e=0.5","e=0.9")
+
+# net div background clades with stem age #
+net_div.bg_clades.stem<-data.frame(matrix(nrow=length(b.stem$taxa),ncol=4))
+for (i in 1:length(b.stem$taxa)) {
+  net_div.bg_clades.stem[i,1]<-b.stem$taxa[i]
+  net_div.bg_clades.stem[i,2]<-bd.ms(phy=NULL, time = as.numeric(b.stem[i,4]), 
+                                      n = as.numeric(b.stem[i,2]),crown=F, epsilon = 0)
+  net_div.bg_clades.stem[i,3]<-bd.ms(phy=NULL, time = as.numeric(b.stem[i,4]), 
+                                      n = as.numeric(b.stem[i,2]),crown=F, epsilon = 0.5)
+  net_div.bg_clades.stem[i,4]<-bd.ms(phy=NULL, time = as.numeric(b.stem[i,4]), 
+                                      n = as.numeric(b.stem[i,2]),crown=F, epsilon = 0.9)
+}
+colnames(net_div.bg_clades.stem)<-c("clade","e=0","e=0.5","e=0.9")
+
