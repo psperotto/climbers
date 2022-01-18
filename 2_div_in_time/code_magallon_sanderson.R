@@ -399,14 +399,19 @@ CrownNtKmore <- function(k, birth.rate, death.rate, time) {
 #####################################
 # example code
 
-example <- get.template(save.file=F)
+#example <- get.template(save.file=F)
 
 ######## PLOT FIG 3 & 4 ######
-
-results <- get.tail.probs(table=example)
-# save(results, file="test.Rsave")
-
-pdf(file="plot.tail.probs.pdf", height=6, width=8)
-plottailprobs(example, results)
-dev.off()
-
+# added the loop to catch the input tables from the list of tables with different background clades (bg.clades)
+i=3
+for (i in 1:length(bg.clades)) {
+  
+  resultsMS <- get.tail.probs(table=bg.clades[[i]]) # de repente ajustar essa função pra gerar só os confidence intervals pra stem ages?
+  # save(resultsMS, file="test.Rsave")
+  
+  #ver como salvar cada vez o pdf com um nome diferente, talvez 'paste0()'?
+  pdf(file="plot.tail.probs.pdf", height=6, width=8)
+  plottailprobs(bg.clades[[i]], resultsMS)
+  dev.off()
+  
+}

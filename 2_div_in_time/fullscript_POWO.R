@@ -1,4 +1,3 @@
-#setwd("G:/Meu Drive/Papers/Diversificação/climbers")
 # "G:/Meu Drive/Papers/Diversificação/climbers/Data/
 
 # reading packages
@@ -10,10 +9,14 @@ library(arsenal)
 library(tidyverse)
 library(geiger)
 
+##### directories #####
+data<-c("G:/Meu Drive/Papers/Diversificação/climbers/Data")
+script<-c("G:/Meu Drive/Papers/Diversificação/climbers/2_div_in_time")
+  
 ##### reading the data #####
-# setwd("G:/Meu Drive/Papers/Diversificação/climbers/Data")
-APGIV<-read.csv("G:/Meu Drive/Papers/Diversificação/climbers/Data/APGIV.csv", sep=",") # dataset with APG IV families and orders
-climbers<-read.csv("G:/Meu Drive/Papers/Diversificação/climbers/Data/climber_database.csv", stringsAsFactors = F)
+#setwd(data)
+APGIV<-read.csv("APGIV.csv", sep=",") # dataset with APG IV families and orders
+climbers<-read.csv("climber_database.csv", stringsAsFactors = F)
 p<- read.delim("G:/Meu Drive/Papers/Diversificação/wcvp_v7_dec_2021.txt", sep="|", header=T) 
 p2<-subset(p, rank=="SPECIES") # coluna 'taxon_name' pra nomes
 powo<-subset(p2, taxonomic_status=="Accepted")
@@ -28,15 +31,14 @@ climbers_acc <- subset(c, taxonomic_status=="Accepted") # accepted names
 # counting species of climbers per family
 spp.family<-as.data.frame(table(unlist(climbers_acc$family)))
 colnames(spp.family)<-c("Family", "Nr")
-#write.csv(spp.family, file="climberfamilies.csv")
 
 # counting species of climbers per genera
 spp.genera<-as.data.frame(table(unlist(climbers_acc$genus)))
 colnames(spp.genera)<-c("Genus", "Nr")
 #spp.genera<-spp.genera[order(spp.genera$Nr),]
 
-#saveRDS(spp.family, file="G:/Meu Drive/Papers/Diversificação/climbers/Data/spp.family.POWO.Rdata")
-#saveRDS(spp.genera, file="G:/Meu Drive/Papers/Diversificação/climbers/Data/spp.genera.POWO.Rdata")
+#saveRDS(spp.family, file="spp.family.POWO.Rdata")
+#saveRDS(spp.genera, file="spp.genera.POWO.Rdata")
 
 # finding all species per genera of climbers 
 spp.all <- powo %>% filter(genus %in% spp.genera$Genus)
@@ -53,7 +55,7 @@ percent<-percent[order(-percent$perc_NT_spp),]
 
 # selecting only genera with >75%
 genera75<-subset(percent.POWO, perc_NT_spp>=0.75) # 184 genera
-# saveRDS(genera, file="G:/Meu Drive/Papers/Diversificação/climbers/Data/genera75.POWO.Rdata")
+#saveRDS(genera75, file="genera75.POWO.Rdata")
 
 ##### extracting ages of genera from S&B tree for the analyses #####
 # read tree
@@ -81,7 +83,7 @@ tree$tip.label<-list
 saveRDS(tree, file="treegenera.RDS")
 
 # getting ages of stem nodes
-treegenera <- readRDS("G:/Meu Drive/Papers/Diversificação/climbers/Data/treegenera.Rdata")
+treegenera <- readRDS("treegenera.Rdata")
 
 get.node.age <- function (phy) {
   root.node <- length(phy$tip.label)+1
@@ -133,7 +135,7 @@ colnames(results)<-c("Genus","Stem_Age")
 results<-results[order(results$Genus),]
 results<-subset(results, Stem_Age!="/") # deixando s? generos que tem Stem Age
 length(results$Genus) # 143
-#saveRDS(results, file = "G:/Meu Drive/Papers/Diversificação/climbers/Data/crown_stem_ages.POWO.Rdata")
+saveRDS(results, file = "crown_stem_ages.POWO.Rdata")
 
 # selecting climbing genera and their total diversity
 f<-spp.all$Genus %in% results$Genus
@@ -159,14 +161,9 @@ for(i in 1:length(genera_list)){
 }
 print(to_exclude) #check those to exclude
 colnames(to_include) <- c("Genus","CM")
-tt <- merge(t, to_include, by="Genus") # 139 genera with >=75% of species being neotropical climbers, all with the same mechanism
+tt <- merge(t, to_include, by="Genus") # 139 genera with >=75% of species being neotropical climbers, and with same mechanism within each genera
 
 ##### table for the M&S analyses #####
-a <- data.frame(taxa=tt$Genus,
-                diversity=tt$Nr,
-                node=c("SG"),
-                age_mean=as.numeric(tt$Stem_Age),
-                stringsAsFactors = FALSE)
 
 p3 <- subset(p,rank=="GENUS")
 p3 <- subset(p3,taxonomic_status=="Accepted")
@@ -177,47 +174,47 @@ orders<-distinct(orders,genus,.keep_all = T)
 orders<-orders[,2:3]
 orders<-orders[order(orders$genus),]
 rownames(orders)<-c(1:139)
-#orders<-orders %>% add_column(order = NA)
+orders<-orders %>% add_column(order = NA)
 orders<-orders %>% add_column(clade = NA)
-
-for (i in 1:length(orders$genus) {
-  #if ( ) ### continue from here tomorrow
-}
-
+# determinando as ordens à mão olhando o site do apg pq estava perdendo tempo pra automatizar, depois eu penso no script pra isso
+#write.csv(orders,file = "xxx.csv")
+#orders<-read.csv(file = "xxx.csv")
 
 for (i in 1:length(orders$order)) {
-  if (orders[i,1]=="Piperales"){
-    orders[i,3]<-"Magnoliids"
+  
+  if (orders[i,3]=="Laurales"){
+    orders[i,4]<-"Magnoliids"
+  }
+    next
+  if (orders[i,3] %in% c("Alismatales", "Asparagales", "Pandanales")==T){
+    orders[i,4]<-"Monocots"
     next
   }
-  if (orders[i,1] %in% c("Alismatales", "Asparagales", "Pandanales")==T){
-    orders[i,3]<-"Monocots"
+  if (orders[i,3] %in% c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")==T){
+    orders[i,4]<-"Superrosids"
     next
   }
-  if (orders[i,1] %in% c("Celastrales","Malpighiales","Cucurbitales","Fabales","Rosales","Sapindales")==T){
-    orders[i,3]<-"Superrosids"
-    next
-  }
-  if (orders[i,1] %in% c("Gentianales","Asterales","Dilleniales","Lamiales","Ericales","Cornales","Caryophyllales","Solanales","Icacinales")==T){
-    orders[i,3]<-"Superasterids"
+  if (orders[i,3] %in% c("Gentianales","Asterales","Dilleniales","Lamiales","Ericales","Cornales","Caryophyllales","Solanales","Icacinales")==T){
+    orders[i,4]<-"Superasterids"
     next
   }  
-  if (orders[i,1]=="Ranunculales"){
-    orders[i,3]<-"Ranunculales"
+  if (orders[i,3]=="Ranunculales"){
+    orders[i,4]<-"Ranunculales"
   }
 }
-# it worked!
-#use rbind
 
 # teste com ages of angiosperms, monocots, etc #
+a <- data.frame(taxa=tt$Genus,
+                diversity=tt$Nr,
+                node=c("SG"),
+                age_mean=as.numeric(tt$Stem_Age),
+                stringsAsFactors = FALSE)
+
 b<-data.frame(taxa=c("bg_clade","Magnoliids", "Monocots", "Superrosids", "Superasterids"),
               diversity=c(352000,10293,69335,87302, 111856), 
               node=c("bg","SG","SG","SG", "SG"),
               age_mean=as.numeric(c(325.1, 134.6, 135.8,123.7,123.7)), 
               stringsAsFactors = FALSE)
-
-#table<-rbind(b,a) 
-write.csv(table, file = "table.csv")
 
 # tables for each background clade
 
