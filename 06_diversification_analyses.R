@@ -2,6 +2,9 @@
 setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
 #rm(list=ls())
 
+source("00_utility_functions.R")
+
+
 climber_clades <- readRDS("bg.clades.list.Rdata")
 
 for (i in 1:length(climber_clades)) {
