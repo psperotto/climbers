@@ -8,7 +8,6 @@ data("wrld_simpl")
 source("00_utility_functions.R")
 source("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/WCVPtools_functions.R")
 
-
 # Hypothesis: Groups with different climbing mechanisms have different support diameter requirements, 
 # and thus the distribution of lineages with different climbing mechanism is influenced by the 
 # surrounding vegetation type
