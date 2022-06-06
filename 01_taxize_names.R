@@ -24,5 +24,3 @@ sb_tree_gbmb$tip.label <- fix.names.taxize(sb_tree_gbmb$tip.label)
 saveRDS(sb_tree_gbmb, file="Data/taxized_GBMB.Rdata")
 
 
-
-
