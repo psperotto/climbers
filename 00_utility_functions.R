@@ -424,7 +424,7 @@ get.tail.prob.crown <- function (eps.yule, eps.high.ext, k, time) {
   # get CI for expected diversity based on background rates from the stem node (eq 10)
   prob <- 0
   time.bins <- seq(1, time, by=1)
-  k.bins <- seq(1, k, by=1)
+  k.bins <- seq(1, k, by=10)
   
   # yule
   k.upper.yule <- matrix (nrow = 0, ncol = 2)
@@ -496,14 +496,14 @@ get.tail.prob.stem <- function (eps.yule, eps.high.ext, k, time) {
   # get CI for expected diversity based on background rates from the stem node (eq 10)
   prob <- 0
   time.bins <- seq(1, time, by=1)
-  k.bins <- seq(1, k, by=1)
+  k.bins <- seq(1, k, by=10)
   
   # yule
   k.upper.yule <- matrix (nrow = 0, ncol = 2)
   colnames(k.upper.yule) <- c("k", "time")
   k.lower.yule <- matrix (nrow = 0, ncol = 2)
   colnames(k.lower.yule) <- c("k", "time")
-  
+
   cat("Estimating confidence intervals of expected species diversity according to the age of stem group (yule): time bins 1 to", time, "\n")
   for (time_index in time.bins) {
     cat("\r", time_index)
@@ -610,54 +610,4 @@ CrownNtKmore <- function(k, birth.rate, death.rate, time) {
   #probNgeNtax <- (beta.t^(k-2))*(k*(1 - alpha.t - beta.t + alpha.t*beta.t) + alpha.t + 2*beta.t -1)/(1 - alpha.t + 2*alpha.t*beta.t)
   #print(probNgeNtax)
   return(probNgeNtax)
-}
-
-# WWFload is taken from speciesgeocodeR; all credit goes to the original authors
-WWFload <- function(x = NULL) {
-  if (missing(x)) {
-    x <- getwd()
-  }
-  download.file("http://assets.worldwildlife.org/publications/15/files/original/official_teow.zip",
-                destfile = file.path(x, "wwf_ecoregions.zip"), quiet=TRUE)
-  unzip(file.path(x, "wwf_ecoregions.zip"), exdir = file.path(x, "WWF_ecoregions"))
-  file.remove(file.path(x, "wwf_ecoregions.zip"))
-  wwf <- maptools::readShapeSpatial(file.path(x, "WWF_ecoregions", "official",
-                                              "wwf_terr_ecos.shp"))
-  return(wwf)
-}
-
-
-localityToBiome <- function (points,lat="lat",lon="lon") {
-  #colnames(points) <- c("acceptedScientificName","key","decimalLatitude","decimalLongitude","basisOfRecord","issues")
-  cat("Getting biome from locality data...")
-  points[,lat] <-  as.numeric(points[,lat])
-  points[,lon] <-  as.numeric(points[,lon])
-  locations.spatial <- sp::SpatialPointsDataFrame(coords=points[,c(lon, lat)], data=points)
-  wwf <- WWFload(tempdir())
-  mappedregions <- sp::over(locations.spatial, wwf)
-  biomes <- c("Tropical & Subtropical Moist Broadleaf Forests", "Tropical & Subtropical Dry Broadleaf Forests", "Tropical & Subtropical Coniferous Forests", "Temperate Broadleaf & Mixed Forests", "Temperate Conifer Forests", "Boreal Forests/Taiga", "Tropical & Subtropical Grasslands, Savannas & Shrubland", "Temperate Grasslands, Savannas & Shrublands", "Flooded Grasslands & Savannas", "Montane Grasslands & Shrublands", "Tundra", "Mediterranean Forests, Woodlands & Scrub", "Deserts & Xeric Shrublands", "Mangroves")
-  points$eco_name <- mappedregions$ECO_NAME
-  points$biome <- biomes[mappedregions$BIOME]
-  return(points)
-}
-
-
-# getting biomes for each species
-getBiomes <- function (points, species="species") {
-  cat("Summarizing biome from locality data...")
-  points <- as.data.frame(points) # not sure how to do it without transforming back to data.frame
-  points <- subset(points, !is.na(points[,"biome"]))
-  categories <- unique(points[,"biome"])
-  taxa <- as.character(unique(points[,species]))
-  result <- matrix(0, nrow=length(taxa), ncol=length(categories))
-  rownames(result) <- taxa
-  colnames(result) <- categories
-  for (taxon_index in seq_along(taxa)) {
-    for (category_index in seq_along(categories)) {
-      x0 <- points[,species]==taxa[taxon_index]
-      x1 <- points[,"biome"]==categories[category_index]
-      result[taxon_index, category_index] <- length(which(x0 & x1))
-    }
-  }
-  return(result)
 }
