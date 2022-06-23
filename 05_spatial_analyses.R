@@ -73,7 +73,7 @@ mechanisms[which(mechanisms==5)] <- "Prehensile_branches"
 mechanisms[which(mechanisms==6)] <- "Prehensile_petioles"
 mechanisms[which(mechanisms==7)] <- "Hooks_or_grapnels"
 
-phyanova <- phylANOVA(pruned_tree, mechanisms, aridity, nsim=10000,p.adj="bonferroni")
+phyanova <- phylANOVA(pruned_tree, mechanisms, aridity, nsim=10000, p.adj="bonferroni")
 
 sink("phylanova_results.txt")
 print(phyanova)
@@ -104,19 +104,23 @@ library(ggridges)
 #plot_comparisons <- ggplot(table_for_plot, aes(x=mean_aridity, y=CM, group=CM)) + 
 #  geom_density_ridges() 
 
+#pals <- c("Set3","Set2","Set1","Pastel2","Pastel1","Paired","Dark2","Accent")
 pdf("aridity_climbers.pdf",height=3,width=5.5)
-plot_comparisons <- ggplot(table_for_plot, aes(x=CM, y=mean_aridity, fill=CM)) + 
-  geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
-  coord_flip()  + 
-  scale_fill_brewer(palette="Pastel1")+
-  theme_bw(base_size = 8) + 
-  theme(legend.position = "none") + 
-  annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
-  xlab("") +
-  ylab("Mean aridity index") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
-        axis.title.x = element_text(colour = 'black', size = 10)) 
-plot_comparisons
-dev.off()
+
+
+  plot_comparisons <- ggplot(table_for_plot, aes(x=CM, y=mean_aridity, fill=CM)) + 
+    geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
+    #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+    coord_flip()  + 
+    scale_fill_brewer(palette="Set3")+
+    theme_bw(base_size = 8) + 
+    theme(legend.position = "none") + 
+    annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
+    xlab("") +
+    ylab("Mean aridity index") +
+    theme(axis.text.y = element_text(colour = 'black', size = 10),
+          axis.text.x = element_text(colour = 'black', size = 10),
+          axis.title.x = element_text(colour = 'black', size = 10)) 
+  plot_comparisons + ggtitle(pal)
+  
+

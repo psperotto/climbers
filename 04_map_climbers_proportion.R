@@ -10,14 +10,13 @@ all_angios <- fread("full_gbif_quest/neotropics_tracheophyte_filtered_gbif.csv")
 all_angios <- all_angios[,2:4]
 
 wcvp_climbers <- readRDS("wcvp_nt_climbers_final.Rdata")
-#all_climbers <- paste(wcvp_climbers$taxon_name, wcvp_climbers$taxon_authors, sep=" ")
+all_climbers <- paste(wcvp_climbers$taxon_name, wcvp_climbers$taxon_authors, sep=" ")
 
-all_climbers <- a
 
 climber_points <- subset(all_angios, all_angios$species %in% all_climbers)
 #non_climber_points <- subset(all_angios, !all_angios$species %in% all_climbers)
 
-climber_points<-as.data.frame(climber_points)
+climber_points <- as.data.frame(climber_points)
 all_angios <- as.data.frame(all_angios)
 
 climber_diversity_raster <- mapDiversity(climber_points, resolution = 1, plot=F)
