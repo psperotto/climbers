@@ -11,16 +11,27 @@ library(raster)
 all_angios <- fread("neotropics_tracheophyte_filtered_gbif.csv")
 all_angios <- all_angios[,2:4]
 
+<<<<<<< HEAD
 climbers_final <- readRDS("climbers_final.Rdata")
 
 # Expert-defined Neotropic areas with 7 areas - Antonelli et al. 2018
 NTshp<-shapefile("C:/Users/patri/Desktop/temp/Zenodo_scripts_and_data_Antonelli-et-al_PNAS/input/shapes/neotropics_areas.shp")
 # Hybrid Neotropics areas (mixed WWF biomes and expert-defined areas) - Antonelli et al 2018
 hybridshp<-shapefile("C:/Users/patri/Desktop/temp/Zenodo_scripts_and_data_Antonelli-et-al_PNAS/input/shapes/hibrid_wwf_experts.shp")
+=======
+wcvp_climbers <- readRDS("wcvp_nt_climbers_final.Rdata")
+all_climbers <- paste(wcvp_climbers$taxon_name, wcvp_climbers$taxon_authors, sep=" ")
+
+>>>>>>> 6e9ab718bea0c1fb821d2bb21cd2ff94f0d81e3f
 
 ##### Generating distribution points and basic maps #####
 
+<<<<<<< HEAD
 pal <- hcl.colors(1000, palette = "YlGnBu", rev=T)
+=======
+climber_points <- as.data.frame(climber_points)
+all_angios <- as.data.frame(all_angios)
+>>>>>>> 6e9ab718bea0c1fb821d2bb21cd2ff94f0d81e3f
 
 ## All angiosperms
 all_angios<-as.data.frame(all_angios)
