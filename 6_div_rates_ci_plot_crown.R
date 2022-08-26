@@ -1,16 +1,13 @@
 #####################################################################
 #####################################################################
 # Code for confidence interval plots (crown node)
-# making mag&sand figures
-rm(list=ls())
+#
+# rm(list=ls())
 
-library("ape")
-library("phangorn")
-library("dplyr")
-library("tidyr")
-library("scales")
-library("parallel")
-library("geiger")
+library(ape)
+library(phangorn)
+library(parallel)
+library(geiger)
 
 setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
 climber_clades_crown <- readRDS("crown.bg.clades.list.Rdata")
@@ -59,6 +56,7 @@ subset_crown <- subset(all_climbers_crown, !is.na(all_climbers_crown$clade))
 subset_crown_t <- subset(subset_crown, subset_crown$CM==2)
 subset_crown_other <- subset(subset_crown, subset_crown$CM!=2)
 
+pdf("ci_plot_crown_nodes.pdf",height=5,width=3)
 # then mag sand
 par(mar=c(3,2,1,0.5))
 par(lwd=.3)
@@ -87,10 +85,10 @@ par(lwd=.6)
 axis(side=1, at = seq(0,260,10), labels = seq(0,260,10), tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(0,0.1,0),las=1, cex.lab=.4)
 axis(side=2, at = 10^{0:5}, labels = 10^{0:5}, tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(2.5,0.2,0),las=1)
 
-#mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
-#par(las=0)
-#mtext(text="Species richness", side=2, line=1.5, cex=.5)
-#par(lwd=.5)
+mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
+par(las=0)
+mtext(text="Species richness", side=2, line=1.5, cex=.5)
+par(lwd=.5)
 
 # adding CI lines
 length_x <- length(limits.df$lb[limits.df$Diversity==352000])
@@ -120,10 +118,10 @@ par(lwd=.6)
 axis(side=1, at = seq(0,260,10), labels = seq(0,260,10), tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(0,0.1,0),las=1, cex.lab=.4)
 axis(side=2, at = 10^{0:5}, labels = 10^{0:5}, tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(2.5,0.2,0),las=1)
 
-#mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
-#par(las=0)
-#mtext(text="Species richness", side=2, line=1.5, cex=.5)
-#par(lwd=.5)
+mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
+par(las=0)
+mtext(text="Species richness", side=2, line=1.5, cex=.5)
+par(lwd=.5)
 
 # adding CI lines
 length_x <- length(limits.df$lb[limits.df$Diversity==352000])
@@ -140,3 +138,5 @@ lines(y=limits.df$ub[limits.df$Diversity==87302], x=1:length_x,lty=4)
 
 #legend(lty=1:5, c("All angiosperms","Magnoliids","Monocots","Superasterids","Superrosids"), x=150, y=5, bty="n", cex = .7, lwd=.8)
 legend(pch=c(21,24), legend = c("other", "tendrils"), x=0, y=1000, bty="n", cex = .7, pt.cex=1.25)
+
+dev.off()

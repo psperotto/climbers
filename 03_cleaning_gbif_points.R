@@ -19,6 +19,8 @@ reference_table <- list.files("/Users/thaisvasconcelos/Desktop/WCVP_special_issu
 reference_table <- do.call(rbind, lapply(reference_table, read.csv))
 reference_table$gbif_name <- fix.names.taxize(reference_table$gbif_name)
 
+##################################
+# (1) Method 1: 
 # Reading gbif file
 gbif_data <- fread("gbif_climbers/0306501-210914110416597.csv") # load the table you downloaded from GBIF
 
@@ -51,6 +53,33 @@ cleaned_points <- RemoveOutliers(cleaned_points, species="scientificName", lon="
 cleaned_points <- RemoveZeros(cleaned_points, lon="decimalLongitude", lat="decimalLatitude")
 cleaned_points <- RemoveSeaPoints(cleaned_points, lon="decimalLongitude", lat="decimalLatitude")
 write.csv(cleaned_points, file=paste0("gbif_climbers/climbers_cleaned_points.csv"), row.names=F)
+
+##################################
+# (2) Method 2: 
+# Reading gbif file
+gbif_data <- fread("full_gbif_quest/neotropics_tracheophyte_filtered_gbif.csv")# load the table you downloaded from GBIF
+gbif_data <- as.data.frame(gbif_data)[,c(2:4)]
+colnames(gbif_data)[1] <- "scientificName"
+
+# Looking at the WCVP table and TDWG to clean GBIF points
+#-----------------------------
+# If local
+path="/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/wgsrpd-master/level3/level3.shp"
+
+twgd_data <- suppressWarnings(maptools::readShapeSpatial(path))
+#issues_to_remove <- read.csv("gbif_issues_to_remove.csv")
+#cultivated <- read.csv("cultivated_species.csv")
+
+#------ Cleaning steps:
+cleaned_points <- gbif_data
+# WCVP filtering
+subset_reference_table <- subset(reference_table, reference_table$gbif_name %in% unique(cleaned_points$scientificName))
+subset_all_vars <- subset(all_vars, all_vars$taxon_name %in% subset_reference_table$wcvp_name)
+if(nrow(subset_reference_table)>0){
+  cleaned_points <- FilterWCVP(cleaned_points, all_vars, subset_reference_table, twgd_data,  lon="lon", lat="lat") # This will filter the GBIF points acording to WCVP for species
+} ## 
+
+
 
 #------------------------
 all_cleaned_points_files <- list.files("gbif_climbers", full.names = T)

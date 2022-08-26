@@ -38,7 +38,7 @@ all_climbers_comparison1 = all_climbers_stem
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==1)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==2)] <- "Specialist"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==3)] <- "Other"
-all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==4)] <- "Specialist" 
+all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==4)] <- "Other" 
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==5)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==6)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==7)] <- "Other"
@@ -70,7 +70,7 @@ climb_comparison1_ast <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sas
 
 plot_comparisons_ros1_stem <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual(values = c("#00588BB3","#00588BB3")) +
@@ -78,15 +78,15 @@ plot_comparisons_ros1_stem <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual( values = c("#4B0055B3", "#4B0055B3")) +
@@ -94,9 +94,9 @@ plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 #########################################################
@@ -141,7 +141,7 @@ names(pal) <- c("Superasterids","Superrosids","Ranunculales","Monocots","Magnoli
 
 plot_comparisons_ros2_stem <- ggplot(all_climbers_comparison2_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual(values = c("#00588BB3","#00588BB3")) +
@@ -149,15 +149,15 @@ plot_comparisons_ros2_stem <- ggplot(all_climbers_comparison2_sros, aes(x=CM, y=
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 plot_comparisons_ast2_stem <- ggplot(all_climbers_comparison2_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual( values = c("#4B0055B3", "#4B0055B3")) +
@@ -165,9 +165,9 @@ plot_comparisons_ast2_stem <- ggplot(all_climbers_comparison2_sast, aes(x=CM, y=
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 
@@ -232,7 +232,7 @@ climb_comparison1_ast <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sas
 
 plot_comparisons_ros1_crown <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual(values = c("#00588BB3","#00588BB3")) +
@@ -240,15 +240,15 @@ plot_comparisons_ros1_crown <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 plot_comparisons_ast1_crown <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual( values = c("#4B0055B3", "#4B0055B3")) +
@@ -256,9 +256,9 @@ plot_comparisons_ast1_crown <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 #########################################################
@@ -300,7 +300,7 @@ climb_comparison2 <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast,ns
 
 plot_comparisons_ros2_crown <- ggplot(all_climbers_comparison2_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual(values = c("#00588BB3","#00588BB3")) +
@@ -308,15 +308,15 @@ plot_comparisons_ros2_crown <- ggplot(all_climbers_comparison2_sros, aes(x=CM, y
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 plot_comparisons_ast2_crown <- ggplot(all_climbers_comparison2_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
-  geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+  #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
   #coord_flip()  + 
   scale_fill_manual( values = c("#4B0055B3", "#4B0055B3")) +
@@ -324,9 +324,9 @@ plot_comparisons_ast2_crown <- ggplot(all_climbers_comparison2_sast, aes(x=CM, y
   theme(legend.position = "none") + 
   annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
   xlab("") +
-  ylab("div rates") +
-  theme(axis.text.y = element_text(colour = 'black', size = 10),
-        axis.text.x = element_text(colour = 'black', size = 10),
+  ylab("net-diversification rates") +
+  theme(axis.text.y = element_text(colour = 'black', size = 5),
+        axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 #########################################################
@@ -335,11 +335,11 @@ plot_comparisons_ast2_crown <- ggplot(all_climbers_comparison2_sast, aes(x=CM, y
 #frst_comp_boxplot <- boxplot(all_climbers_comparison1$div_rate_eps0.9~all_climbers_comparison1$CM, ylim=c(0,1))
 #scnd_comp_boxplot <- boxplot(all_climbers_comparison2$div_rate_eps0.9~all_climbers_comparison2$CM, ylim=c(0,1))
 
-pdf("div_rate_comparisons.pdf",height=3,width=5.5)
+pdf("div_rate_comparisons_stem.pdf",height=3,width=5.5)
 grid.arrange(plot_comparisons_ast1_stem, plot_comparisons_ast2_stem, plot_comparisons_ros1_stem, plot_comparisons_ros2_stem, ncol=4, nrow = 1)
 dev.off()
 
-pdf("div_rate_comparisons.pdf",height=3,width=5.5)
+pdf("div_rate_comparisons_crown.pdf",height=3,width=5.5)
 grid.arrange(plot_comparisons_ast1_crown, plot_comparisons_ast2_crown, plot_comparisons_ros1_crown, plot_comparisons_ros2_crown, ncol=4, nrow = 1)
 dev.off()
 

@@ -1,16 +1,13 @@
 #####################################################################
 #####################################################################
 # Code for confidence interval plots (stem node)
-# making mag&sand figures
-rm(list=ls())
+#
+#rm(list=ls())
 
-library("ape")
-library("phangorn")
-library("dplyr")
-library("tidyr")
-library("scales")
-library("parallel")
-library("geiger")
+library(ape)
+library(phangorn)
+library(parallel)
+library(geiger)
 
 setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
 climber_clades_stem <- readRDS("stem.bg.clades.list.Rdata")
@@ -58,8 +55,7 @@ subset_stem <- subset(all_climbers_stem, !is.na(all_climbers_stem$clade))
 subset_stem_t <- subset(subset_stem, subset_stem$CM==2)
 subset_stem_other <- subset(subset_stem, subset_stem$CM!=2)
 
-########################################################################################
-########################################################################################
+pdf("ci_plot_stem_nodes.pdf",height=5,width=3)
 ########################################################################################
 # ROSIDS
 par(mar=c(3,2,1,0.5))
@@ -72,18 +68,15 @@ names(pal) <- c("Superasterids","Superrosids","Ranunculales","Monocots","Magnoli
 plot(x=subset_stem_t$age_mean[subset_stem_t$clade=="Superrosids"], y=subset_stem_t$diversity[subset_stem_t$clade=="Superrosids"], ylim=c(1,1000), xlim=c(0,30), log="y", xaxt="n", yaxt="n", bty="n", xlab="", ylab="", pch=24, bg=pal['Superrosids'], cex=1, lwd=0.5)
 points(x=subset_stem_other$age_mean[subset_stem_other$clade=="Superrosids"], y=subset_stem_other$diversity[subset_stem_other$clade=="Superrosids"], pch=21, bg=pal['Superrosids'], cex=1, lwd=0.5)
 
-#points(x=lsca.df.sum$Age_mean, y=lsca.df.sum$Clade_richness, pch=22, bg='white', cex=1.2)
-#text(x=lsca.df.sum$Age_mean+c(-10,10,-10), y=lsca.df.sum$Clade_richness-c(1000,2000,1000), c("D", "P", "R"), cex=.8)
-
 # adding axes
 par(lwd=.6)
 axis(side=1, at = seq(0,260,10), labels = seq(0,260,10), tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(0,0.1,0),las=1, cex.lab=.4)
 axis(side=2, at = 10^{0:5}, labels = 10^{0:5}, tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(2.5,0.2,0),las=1)
 
-#mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
-#par(las=0)
-#mtext(text="Species richness", side=2, line=1.5, cex=.5)
-#par(lwd=.5)
+mtext(text="Stem age (Mya)", side=1, line=1, cex=.5)
+par(las=0)
+mtext(text="Species richness", side=2, line=1.5, cex=.5)
+par(lwd=.5)
 
 # adding CI lines
 length_x <- length(limits.df$lb[limits.df$Diversity==352000])
@@ -106,18 +99,15 @@ names(pal) <- c("Superasterids","Superrosids","Ranunculales","Monocots","Magnoli
 plot(x=subset_stem_t$age_mean[subset_stem_t$clade=="Superasterids"], y=subset_stem_t$diversity[subset_stem_t$clade=="Superasterids"], ylim=c(1,1000), xlim=c(0,30), log="y", xaxt="n", yaxt="n", bty="n", xlab="", ylab="", pch=24, bg=pal['Superasterids'], cex=1, lwd=0.5)
 points(x=subset_stem_other$age_mean[subset_stem_other$clade=="Superasterids"], y=subset_stem_other$diversity[subset_stem_other$clade=="Superasterids"], pch=21, bg=pal['Superasterids'], cex=1, lwd=0.5)
 
-#points(x=lsca.df.sum$Age_mean, y=lsca.df.sum$Clade_richness, pch=22, bg='white', cex=1.2)
-#text(x=lsca.df.sum$Age_mean+c(-10,10,-10), y=lsca.df.sum$Clade_richness-c(1000,2000,1000), c("D", "P", "R"), cex=.8)
-
 # adding axes
 par(lwd=.6)
 axis(side=1, at = seq(0,260,10), labels = seq(0,260,10), tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(0,0.1,0),las=1, cex.lab=.4)
 axis(side=2, at = 10^{0:5}, labels = 10^{0:5}, tick = TRUE, line = 0, lwd = .4, cex.axis=.6, tcl=NA, mgp=c(2.5,0.2,0),las=1)
 
-#mtext(text="Crown age (Mya)", side=1, line=1, cex=.5)
-#par(las=0)
-#mtext(text="Species richness", side=2, line=1.5, cex=.5)
-#par(lwd=.5)
+mtext(text="Stem age (Mya)", side=1, line=1, cex=.5)
+par(las=0)
+mtext(text="Species richness", side=2, line=1.5, cex=.5)
+par(lwd=.5)
 
 # adding CI lines
 length_x <- length(limits.df$lb[limits.df$Diversity==352000])
@@ -129,3 +119,4 @@ lines(y=limits.df$ub[limits.df$Diversity==87302], x=1:length_x,lty=2)
 #legend(lty=1:5, c("All angiosperms","Magnoliids","Monocots","Superasterids","Superrosids"), x=150, y=5, bty="n", cex = .7, lwd=.8)
 legend(pch=c(21,24), legend = c("other", "tendrils"), x=0, y=1000, bty="n", cex = .7, pt.cex=1.25)
 
+dev.off()

@@ -8,16 +8,17 @@ data("wrld_simpl")
 source("00_utility_functions.R")
 source("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/WCVPtools_functions.R")
 
-# Hypothesis: Groups with different climbing mechanisms have different support diameter requirements, 
+# Hypothesis: Groups with different climbing mechanisms have different support diameter requirements,
 # and thus the distribution of lineages with different climbing mechanism is influenced by the 
 # surrounding vegetation type
 
-climber_points <- as.data.frame(fread("gbif_climbers/climbers_cleaned_points.csv"))
+#climber_points <- as.data.frame(fread("gbif_climbers/climbers_cleaned_points.csv"))
+climber_points <- readRDS("filtered_gbif_wcvp.Rdata")
 climber_mech <- readRDS("wcvp_nt_climbers_final.Rdata")
 #climber_mech <- read.csv("Data/climber_database.csv")
-climber_mech$taxon_and_author <- paste0(climber_mech$taxon_name, " ", climber_mech$taxon_authors)
+#climber_mech$taxon_and_author <- paste0(climber_mech$taxon_name, " ", climber_mech$taxon_authors)
 #colnames(climber_mech) <- c("family","genus","species","CM","taxized_names")
-merged_table <- merge(climber_mech, climber_points, by.x = "taxon_and_author", by.y = "scientificName")
+merged_table <- merge(climber_mech, climber_points, by.x = "taxon_name", by.y = "scientificName")
 
 # Directory to save preliminary datasets:
 climate_data.dir <- "./climate_data"
@@ -25,7 +26,8 @@ climate_data.dir <- "./climate_data"
 climate_layers.dir <- "./climate_layers"
 
 # 1. Thinning occurence data first
-thinned_points <- Thinning(merged_table, species="taxon_and_author", lat = "decimalLatitude", lon="decimalLongitude", n = 3)
+thinned_points <- Thinning(merged_table, species="taxon_name", lat = "y", lon="x", n = 3)
+beepr::beep(sound=1)
 # write.csv(thinned_points, file=paste0(climate_data.dir, "/climbers_thinned_points.csv"), row.names=F)
 # thinned_points <- read.csv(paste0(climate_data.dir, "/climbers_thinned_points.csv"))
 
@@ -42,10 +44,14 @@ write.csv(summstats, file=paste0(climate_data.dir, "/climbers_summstats.csv"), r
 # Higher AI will represent higher potential for vegetation growth (i.e. closed canopy environments)
 summstats <- read.csv(paste0(climate_data.dir, "/climbers_summstats.csv"))
 
+summstats <- summstats[[4]]
 ai_table <- summstats[,c("species","mean_aridity")]
+ai_table <- as.data.frame(ai_table)
 ai_table$mean_aridity <- as.numeric(ai_table$mean_aridity)
-merged_table <- merge(climber_mech, ai_table, by.x="taxon_and_author", by.y="species")
+merged_table <- merge(climber_mech, ai_table, by.x="taxon_name", by.y="species")
+merged_table$taxon_and_author <- paste0(merged_table$taxon_name, " ", merged_table$taxon_authors)
 
+#length(unique(subset_merged_table$taxon_name))
 #boxplot(exp(merged_table$mean_aridity) ~ merged_table$CM)
 
 # Load tree for PCMs
@@ -53,12 +59,16 @@ library(ape)
 library(phytools)
 tree <- readRDS("trees/taxized_GBMB.Rdata")
 tree$tip.label <- unname(tree$tip.label)
+#tree <- drop.tip(tree, which(duplicated(tree$tip.label)))
 
 subset_merged_table <- subset(merged_table, merged_table$taxon_and_author%in%tree$tip.label)
 subset_merged_table <- subset(subset_merged_table, !duplicated(subset_merged_table$taxon_and_author))
-pruned_tree <- keep.tip(tree, intersect(subset_merged_table$taxon_and_author, tree$tip.label))
+pruned_tree <- keep.tip(tree, subset_merged_table$taxon_and_author)
 pruned_tree$tip.label <- paste0(unlist(lapply(strsplit(pruned_tree$tip.label, " "), "[[", 1)), " ", unlist(lapply(strsplit(pruned_tree$tip.label, " "), "[[", 2)))
 subset_merged_table$taxon_and_author <- paste0(unlist(lapply(strsplit(subset_merged_table$taxon_and_author, " "), "[[", 1)), " ", unlist(lapply(strsplit(subset_merged_table$taxon_and_author, " "), "[[", 2)))
+
+#plot(pruned_tree, cex=0.1)
+#pruned_tree <- drop.tip(pruned_tree, which(duplicated(pruned_tree$tip.label)))
 
 # phyloanova
 aridity <- subset_merged_table$mean_aridity
@@ -110,7 +120,7 @@ pdf("aridity_climbers.pdf",height=3,width=5.5)
 
   plot_comparisons <- ggplot(table_for_plot, aes(x=CM, y=mean_aridity, fill=CM)) + 
     geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
-    #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
+    geom_jitter(colour = 2, alpha=0.3, size=0.3) +
     coord_flip()  + 
     scale_fill_brewer(palette="Set3")+
     theme_bw(base_size = 8) + 
@@ -121,6 +131,7 @@ pdf("aridity_climbers.pdf",height=3,width=5.5)
     theme(axis.text.y = element_text(colour = 'black', size = 10),
           axis.text.x = element_text(colour = 'black', size = 10),
           axis.title.x = element_text(colour = 'black', size = 10)) 
-  plot_comparisons + ggtitle(pal)
-  
+  plot_comparisons 
+
+dev.off()
 
