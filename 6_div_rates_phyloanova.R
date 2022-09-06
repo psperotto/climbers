@@ -1,5 +1,5 @@
 # Diversification analyses
-setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
+setwd("~/Desktop/Pubs_inprep/WCVP_special_issue/Patricia_Climbers/climbers")
 #rm(list=ls())
 library(geiger)
 library(phytools)
@@ -33,7 +33,7 @@ for(u in 1:nrow(all_climbers_stem)) {
 all_genera_tree <- read.tree("climber_genera_tree.tre")
 
 #########################################################
-# Comparison including both tendrils (trait 2) and adhesive roots (trait 4) as specialized mechanism
+# Comparison including tendrils (trait 2) as specialized mechanism, 0 extinction
 all_climbers_comparison1 = all_climbers_stem
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==1)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==2)] <- "Specialist"
@@ -48,27 +48,27 @@ all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==8)] <- "Other"
 # Superrosids
 all_climbers_comparison1_sros <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superrosids")
 
-div_rates_sros <- all_climbers_comparison1_sros$div_rate_eps0.9
+div_rates_sros <- all_climbers_comparison1_sros$div_rate_eps0
 names(div_rates_sros) <- all_climbers_comparison1_sros$taxa
 mech_sros <- all_climbers_comparison1_sros$CM
 names(mech_sros) <- all_climbers_comparison1_sros$taxa
 
 all_genera_tree_ros <- keep.tip(all_genera_tree, all_climbers_comparison1_sros$taxa)
-climb_comparison1_ros <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros ,nsim=1000, p.adj="bonferroni")
+climb_comparison1_ros_stem <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros ,nsim=1000, p.adj="bonferroni")
 
 #########################################################
 # Superasterids
 all_climbers_comparison1_sast <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superasterids")
 
-div_rates_sast <- all_climbers_comparison1_sast$div_rate_eps0.9
+div_rates_sast <- all_climbers_comparison1_sast$div_rate_eps0
 names(div_rates_sast) <- all_climbers_comparison1_sast$taxa
 mech_sast <- all_climbers_comparison1_sast$CM
 names(mech_sast) <- all_climbers_comparison1_sast$taxa
 
 all_genera_tree_ast <- keep.tip(all_genera_tree, all_climbers_comparison1_sast$taxa)
-climb_comparison1_ast <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast, nsim=1000, p.adj="bonferroni")
+climb_comparison1_ast_stem <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast, nsim=1000, p.adj="bonferroni")
 
-plot_comparisons_ros1_stem <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
+plot_comparisons_ros1_stem <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
@@ -83,7 +83,7 @@ plot_comparisons_ros1_stem <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=
         axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
-plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
+plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
   #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
@@ -100,7 +100,7 @@ plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
 #########################################################
-# Comparison including only tendrils (trait 2) as specialized mechanism 
+# Comparison including tendrils (trait 2) as specialized mechanism, extinction fraction 0.9
 all_climbers_comparison2 = all_climbers_stem
 all_climbers_comparison2$CM[which(all_climbers_comparison2$CM==1)] <- "Other"
 all_climbers_comparison2$CM[which(all_climbers_comparison2$CM==2)] <- "Specialist"
@@ -121,7 +121,7 @@ mech_sros <- all_climbers_comparison2_sros$CM
 names(mech_sros) <- all_climbers_comparison2_sros$taxa
 
 all_genera_tree_ros <- keep.tip(all_genera_tree, all_climbers_comparison2_sros$taxa)
-climb_comparison2 <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros,nsim=1000, p.adj="bonferroni")
+climb_comparison2_ros_stem <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros,nsim=1000, p.adj="bonferroni")
 
 #########################################################
 # Superasterids
@@ -133,7 +133,7 @@ mech_sast <- all_climbers_comparison2_sast$CM
 names(mech_sast) <- all_climbers_comparison2_sast$taxa
 
 all_genera_tree_ast <- keep.tip(all_genera_tree, all_climbers_comparison2_sast$taxa)
-climb_comparison2 <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast,nsim=1000, p.adj="bonferroni")
+climb_comparison2_ast_stem <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast,nsim=1000, p.adj="bonferroni")
 
 # PLOTS
 pal <- hcl.colors(5, palette = "Viridis", alpha = 0.7)
@@ -194,12 +194,12 @@ all_genera_tree <- read.tree("climber_genera_tree.tre")
 
 #########################################################
 #########################################################
-# Comparison including both tendrils (trait 2) and adhesive roots (trait 4) as specialized mechanism
+# Comparison including tendrils (trait 2) as specialized mechanism, 0 extinction
 all_climbers_comparison1 = all_climbers_crown
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==1)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==2)] <- "Specialist"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==3)] <- "Other"
-all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==4)] <- "Specialist" 
+all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==4)] <- "Other" 
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==5)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==6)] <- "Other"
 all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==7)] <- "Other"
@@ -209,28 +209,28 @@ all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==8)] <- "Other"
 # Superrosids
 all_climbers_comparison1_sros <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superrosids")
 
-div_rates_sros <- all_climbers_comparison1_sros$div_rate_eps0.9
+div_rates_sros <- all_climbers_comparison1_sros$div_rate_eps0
 names(div_rates_sros) <- all_climbers_comparison1_sros$taxa
 mech_sros <- all_climbers_comparison1_sros$CM
 names(mech_sros) <- all_climbers_comparison1_sros$taxa
 
 all_genera_tree_ros <- keep.tip(all_genera_tree, all_climbers_comparison1_sros$taxa)
-climb_comparison1_ros <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros ,nsim=1000, p.adj="bonferroni")
+climb_comparison1_ros_crown <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros ,nsim=1000, p.adj="bonferroni")
 
 #########################################################
 # Superasterids
 all_climbers_comparison1_sast <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superasterids")
 
-div_rates_sast <- all_climbers_comparison1_sast$div_rate_eps0.9
+div_rates_sast <- all_climbers_comparison1_sast$div_rate_eps0
 names(div_rates_sast) <- all_climbers_comparison1_sast$taxa
 mech_sast <- all_climbers_comparison1_sast$CM
 names(mech_sast) <- all_climbers_comparison1_sast$taxa
 
 all_genera_tree_ast <- keep.tip(all_genera_tree, all_climbers_comparison1_sast$taxa)
-climb_comparison1_ast <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast, nsim=1000, p.adj="bonferroni")
+climb_comparison1_ast_crown <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast, nsim=1000, p.adj="bonferroni")
 
 
-plot_comparisons_ros1_crown <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
+plot_comparisons_ros1_crown <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y=div_rate_eps0, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
   coord_cartesian(ylim = c(0, 1)) +
@@ -245,7 +245,7 @@ plot_comparisons_ros1_crown <- ggplot(all_climbers_comparison1_sros, aes(x=CM, y
         axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
 
-plot_comparisons_ast1_crown <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
+plot_comparisons_ast1_crown <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=div_rate_eps0, fill=CM)) + 
   geom_boxplot(lwd=0.3, outlier.size=0.25, alpha=0.8) + 
   #stat_compare_means(comparisons = 3) + # Add pairwise comparisons p-value
   #geom_jitter(colour = 2, alpha=0.3, size=0.9) +
@@ -283,7 +283,7 @@ mech_sros <- all_climbers_comparison2_sros$CM
 names(mech_sros) <- all_climbers_comparison2_sros$taxa
 
 all_genera_tree_ros <- keep.tip(all_genera_tree, all_climbers_comparison2_sros$taxa)
-climb_comparison2 <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros,nsim=1000, p.adj="bonferroni")
+climb_comparison2_ros_crown <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros,nsim=1000, p.adj="bonferroni")
 
 #########################################################
 # Superasterids
@@ -295,7 +295,7 @@ mech_sast <- all_climbers_comparison2_sast$CM
 names(mech_sast) <- all_climbers_comparison2_sast$taxa
 
 all_genera_tree_ast <- keep.tip(all_genera_tree, all_climbers_comparison2_sast$taxa)
-climb_comparison2 <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast,nsim=1000, p.adj="bonferroni")
+climb_comparison2_ast_crown <- phylANOVA(all_genera_tree_ast, mech_sast, div_rates_sast,nsim=1000, p.adj="bonferroni")
 
 
 plot_comparisons_ros2_crown <- ggplot(all_climbers_comparison2_sros, aes(x=CM, y=div_rate_eps0.9, fill=CM)) + 
@@ -343,3 +343,40 @@ pdf("div_rate_comparisons_crown.pdf",height=3,width=5.5)
 grid.arrange(plot_comparisons_ast1_crown, plot_comparisons_ast2_crown, plot_comparisons_ros1_crown, plot_comparisons_ros2_crown, ncol=4, nrow = 1)
 dev.off()
 
+
+sink("phyloanova_results.txt")
+cat("Stem node, 0 extinction","\n")
+cat("Rosids","\n")
+climb_comparison1_ros_stem
+cat("Asterids","\n")
+climb_comparison1_ast_stem
+cat("######################","\n")
+cat("######################","\n")
+
+
+cat("Stem node, 0.9 extinction","\n")
+cat("Rosids","\n")
+climb_comparison2_ros_stem
+cat("Asterids","\n")
+climb_comparison2_ast_stem
+cat("######################","\n")
+cat("######################","\n")
+
+cat("Crown node, 0 extinction","\n")
+cat("Rosids","\n")
+climb_comparison1_ros_crown
+cat("Asterids","\n")
+climb_comparison1_ast_crown
+cat("######################","\n")
+cat("######################","\n")
+
+cat("Crown node, 0.9 extinction","\n")
+cat("Rosids","\n")
+climb_comparison2_ros_crown
+cat("Asterids","\n")
+climb_comparison2_ast_crown
+
+cat("######################","\n")
+cat("######################","\n")
+
+sink()
