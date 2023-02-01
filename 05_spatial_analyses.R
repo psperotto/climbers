@@ -1,12 +1,12 @@
 # rm(list=ls())
-setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
+setwd("~/Desktop/Pubs_inprep/WCVP_special_issue/Patricia_Climbers/climbers")
 
 library(maptools)
 library(data.table)
 data("wrld_simpl")
 
 source("00_utility_functions.R")
-source("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/WCVPtools_functions.R")
+source("/Users/thaisvasconcelos/Desktop/Pubs_inprep/WCVP_special_issue/WCVPtools/WCVPtools_functions.R")
 
 # Hypothesis: Groups with different climbing mechanisms have different support diameter requirements,
 # and thus the distribution of lineages with different climbing mechanism is influenced by the 
@@ -44,7 +44,7 @@ write.csv(summstats, file=paste0(climate_data.dir, "/climbers_summstats.csv"), r
 # Higher AI will represent higher potential for vegetation growth (i.e. closed canopy environments)
 summstats <- read.csv(paste0(climate_data.dir, "/climbers_summstats.csv"))
 
-summstats <- summstats[[4]]
+#summstats <- summstats[[4]]
 ai_table <- summstats[,c("species","mean_aridity")]
 ai_table <- as.data.frame(ai_table)
 ai_table$mean_aridity <- as.numeric(ai_table$mean_aridity)
@@ -85,7 +85,7 @@ mechanisms[which(mechanisms==7)] <- "Hooks_or_grapnels"
 
 phyanova <- phylANOVA(pruned_tree, mechanisms, aridity, nsim=10000, p.adj="bonferroni")
 
-sink("phylanova_results.txt")
+sink("phylanova_AI_results.txt")
 print(phyanova)
 sink()
 
@@ -97,6 +97,7 @@ boxplot(exp(subset_merged_table$mean_aridity) ~ subset_merged_table$CM)
 table_for_plot <- subset_merged_table
 table_for_plot$CM <- as.character(table_for_plot$CM)
 table_for_plot$mean_aridity <- exp(table_for_plot$mean_aridity)
+table_for_plot$mean_aridity <- table_for_plot$mean_aridity / 10000
 
 table_for_plot$CM[which(table_for_plot$CM==1)] <- "Twining"
 table_for_plot$CM[which(table_for_plot$CM==2)] <- "Tendrils"
@@ -106,9 +107,18 @@ table_for_plot$CM[which(table_for_plot$CM==5)] <- "Prehensile branches"
 table_for_plot$CM[which(table_for_plot$CM==6)] <- "Prehensile petioles"
 table_for_plot$CM[which(table_for_plot$CM==7)] <- "Hooks or grapnels"
 
+table(table_for_plot$CM)
 
 library(ggplot2)
 library(ggridges)
+
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Twining"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Tendrils"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Simple scrambling"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Adhesive roots"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Prehensile branches"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Prehensile petioles"])
+median(table_for_plot$mean_aridity[table_for_plot$CM=="Hooks or grapnels"])
 
 # possible plots
 #plot_comparisons <- ggplot(table_for_plot, aes(x=mean_aridity, y=CM, group=CM)) + 
@@ -127,7 +137,7 @@ pdf("aridity_climbers.pdf",height=3,width=5.5)
     theme(legend.position = "none") + 
     annotate(geom="text", x=.9, y=0.9, size=3, hjust=0, label="") + 
     xlab("") +
-    ylab("Mean aridity index") +
+    ylab("Aridity Index") +
     theme(axis.text.y = element_text(colour = 'black', size = 10),
           axis.text.x = element_text(colour = 'black', size = 10),
           axis.title.x = element_text(colour = 'black', size = 10)) 

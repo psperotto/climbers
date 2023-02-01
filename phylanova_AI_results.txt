@@ -1,0 +1,49 @@
+ANOVA table: Phylogenetic ANOVA
+
+Response: y
+           Sum Sq  Mean Sq   F value Pr(>F)
+x         33.0225 5.503749 27.382075 0.2848
+Residual 254.0618 0.200998                 
+
+P-value based on simulation.
+---------
+
+Pairwise posthoc test using method = "bonferroni"
+
+Pairwise t-values:
+                    Adhesive_roots Hooks_or_grapnels Prehensile_branches
+Adhesive_roots            0.000000         -0.424547            1.709929
+Hooks_or_grapnels         0.424547          0.000000            1.113622
+Prehensile_branches      -1.709929         -1.113622            0.000000
+Prehensile_petioles      -5.222094         -3.464207           -3.703573
+Simple_scrambling        -8.175056         -2.422817           -2.790594
+Tendrils                -10.411328         -2.750288           -3.595990
+Twining                 -11.587111         -2.758501           -3.681190
+                    Prehensile_petioles Simple_scrambling  Tendrils   Twining
+Adhesive_roots                 5.222094          8.175056 10.411328 11.587111
+Hooks_or_grapnels              3.464207          2.422817  2.750288  2.758501
+Prehensile_branches            3.703573          2.790594  3.595990  3.681190
+Prehensile_petioles            0.000000         -2.455350 -2.039508 -2.066875
+Simple_scrambling              2.455350          0.000000  1.469018  1.627949
+Tendrils                       2.039508         -1.469018  0.000000 -0.033129
+Twining                        2.066875         -1.627949  0.033129  0.000000
+
+Pairwise corrected P-values:
+                    Adhesive_roots Hooks_or_grapnels Prehensile_branches
+Adhesive_roots              1.0000                 1                   1
+Hooks_or_grapnels           1.0000                 1                   1
+Prehensile_branches         1.0000                 1                   1
+Prehensile_petioles         0.2730                 1                   1
+Simple_scrambling           0.4305                 1                   1
+Tendrils                    1.0000                 1                   1
+Twining                     0.6552                 1                   1
+                    Prehensile_petioles Simple_scrambling Tendrils Twining
+Adhesive_roots                    0.273            0.4305        1  0.6552
+Hooks_or_grapnels                 1.000            1.0000        1  1.0000
+Prehensile_branches               1.000            1.0000        1  1.0000
+Prehensile_petioles               1.000            1.0000        1  1.0000
+Simple_scrambling                 1.000            1.0000        1  1.0000
+Tendrils                          1.000            1.0000        1  1.0000
+Twining                           1.000            1.0000        1  1.0000
+---------
+
