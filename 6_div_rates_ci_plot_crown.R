@@ -9,7 +9,7 @@ library(phangorn)
 library(parallel)
 library(geiger)
 
-setwd("~/Desktop/WCVP_special_issue/Patricia_Climbers/climbers")
+setwd("~/Desktop/Pubs_inprep/WCVP_special_issue/Patricia_Climbers/climbers")
 climber_clades_crown <- readRDS("crown.bg.clades.list.Rdata")
 all_climbers_crown <- climber_clades_crown[[7]]
 all_climbers_crown <- subset(all_climbers_crown, all_climbers_crown$diversity > 1) #need to remove those with only one species
@@ -20,34 +20,55 @@ all_climbers_crown <- subset(all_climbers_crown, all_climbers_crown$diversity > 
 # get diversification rates
 lsca.df.sum1 <- all_climbers_crown[1:6,]
 
-epsilon <- 0.9 # 
+epsilon_high <- 0.9 # 
 root.age <- as.numeric(lsca.df.sum1[1,'age_mean'])
 
-r_all_angios <- bd.ms(time = as.numeric(lsca.df.sum1[1,'age_mean']), n = as.numeric(lsca.df.sum1[1,'diversity']), crown = FALSE, epsilon = epsilon)
-r_magnoliids <- bd.ms(time = as.numeric(lsca.df.sum1[2,'age_mean']), n = as.numeric(lsca.df.sum1[2,'diversity']), crown = FALSE, epsilon = epsilon)
-r_monocots <- bd.ms(time = as.numeric(lsca.df.sum1[3,'age_mean']), n = as.numeric(lsca.df.sum1[3,'diversity']), crown = FALSE, epsilon = epsilon)
+#r_all_angios <- bd.ms(time = as.numeric(lsca.df.sum1[1,'age_mean']), n = as.numeric(lsca.df.sum1[1,'diversity']), epsilon = epsilon_high)
+#r_magnoliids <- bd.ms(time = as.numeric(lsca.df.sum1[2,'age_mean']), n = as.numeric(lsca.df.sum1[2,'diversity']), epsilon = epsilon_high)
+#r_monocots <- bd.ms(time = as.numeric(lsca.df.sum1[3,'age_mean']), n = as.numeric(lsca.df.sum1[3,'diversity']), epsilon = epsilon_high)
+r_rosids <- bd.ms(time = as.numeric(lsca.df.sum1[4,'age_mean']), n = as.numeric(lsca.df.sum1[4,'diversity']),  epsilon = epsilon_high)
+r_asterids <- bd.ms(time = as.numeric(lsca.df.sum1[5,'age_mean']), n = as.numeric(lsca.df.sum1[5,'diversity']),  epsilon = epsilon_high)
+#r_ranunculales <- bd.ms(time = as.numeric(lsca.df.sum1[6,'age_mean']), n = as.numeric(lsca.df.sum1[6,'diversity']), #epsilon = epsilon_high)
+
+tot.div1 <- c(as.numeric(lsca.df.sum1[4,'diversity']),
+              as.numeric(lsca.df.sum1[5,'diversity']))
+all_r <- c(r_rosids, r_asterids)
+
+getcrownLimits <- function(r, time, e=epsilon) {
+  t(sapply(time, crown.limits, epsilon=e, r=r))
+}
+
+limits <- mclapply(all_r, getcrownLimits, time=2:root.age, e=epsilon_high, mc.cores = detectCores()-1)
+
+limits.df_high <- data.frame(rbind(limits[[1]], limits[[2]]),
+                             Diversity=factor(rep(tot.div1, each=nrow(limits[[1]]))),
+                             r=rep(all_r, each=nrow(limits[[1]])))
+colnames(limits.df_high)[1:2] <- c("lb", "ub")
+
+###
+epsilon <- 0.5 # 
+root.age <- as.numeric(lsca.df.sum1[1,'age_mean'])
+
+#r_all_angios <- bd.ms(time = as.numeric(lsca.df.sum1[1,'age_mean']), n = as.numeric(lsca.df.sum1[1,'diversity']), crown = FALSE, epsilon = epsilon)
+#r_magnoliids <- bd.ms(time = as.numeric(lsca.df.sum1[2,'age_mean']), n = as.numeric(lsca.df.sum1[2,'diversity']), crown = FALSE, epsilon = epsilon)
+#r_monocots <- bd.ms(time = as.numeric(lsca.df.sum1[3,'age_mean']), n = as.numeric(lsca.df.sum1[3,'diversity']), crown = FALSE, epsilon = epsilon)
 r_rosids <- bd.ms(time = as.numeric(lsca.df.sum1[4,'age_mean']), n = as.numeric(lsca.df.sum1[4,'diversity']), crown = FALSE, epsilon = epsilon)
 r_asterids <- bd.ms(time = as.numeric(lsca.df.sum1[5,'age_mean']), n = as.numeric(lsca.df.sum1[5,'diversity']), crown = FALSE, epsilon = epsilon)
-r_ranunculales <- bd.ms(time = as.numeric(lsca.df.sum1[6,'age_mean']), n = as.numeric(lsca.df.sum1[6,'diversity']), crown = FALSE, epsilon = epsilon)
+#r_ranunculales <- bd.ms(time = as.numeric(lsca.df.sum1[6,'age_mean']), n = as.numeric(lsca.df.sum1[6,'diversity']), crown = FALSE, epsilon = epsilon)
 
-tot.div1 <- c(as.numeric(lsca.df.sum1[1,'diversity']),
-              as.numeric(lsca.df.sum1[2,'diversity']),
-              as.numeric(lsca.df.sum1[3,'diversity']),
-              as.numeric(lsca.df.sum1[4,'diversity']),
-              as.numeric(lsca.df.sum1[5,'diversity']),
-              as.numeric(lsca.df.sum1[6,'diversity']))
-all_r <- c(r_all_angios, r_magnoliids, r_monocots, r_rosids, r_asterids, r_ranunculales)
+tot.div1 <- c(as.numeric(lsca.df.sum1[4,'diversity']),
+              as.numeric(lsca.df.sum1[5,'diversity']))
+all_r <- c(r_rosids, r_asterids)
 
 getcrownLimits <- function(time, e=epsilon, r) {
   t(sapply(time, crown.limits, epsilon=e, r=r))
 }
 
 limits <- mclapply(all_r, getcrownLimits, time=2:root.age, e=epsilon, mc.cores = detectCores()-1)
-limits.df <- data.frame(rbind(limits[[1]], limits[[2]],
-                              limits[[3]], limits[[4]],
-                              limits[[5]], limits[[6]]),
-                        Diversity=factor(rep(tot.div1, each=nrow(limits[[1]]))),
-                        r=rep(all_r, each=nrow(limits[[1]])))
+limits.df <- data.frame(rbind(limits[[1]], limits[[2]]),
+                             Diversity=factor(rep(tot.div1, each=nrow(limits[[1]]))),
+                             r=rep(all_r, each=nrow(limits[[1]])))
+
 colnames(limits.df)[1:2] <- c("lb", "ub")
 
 
@@ -68,17 +89,6 @@ names(pal) <- c("Superasterids","Superrosids","Ranunculales","Monocots","Magnoli
 plot(x=subset_crown_t$age_mean[subset_crown_t$clade=="Superrosids"], y=subset_crown_t$diversity[subset_crown_t$clade=="Superrosids"], ylim=c(1,1000), xlim=c(0,30), log="y", xaxt="n", yaxt="n", bty="n", xlab="", ylab="", pch=24, bg=pal['Superrosids'], cex=1, lwd=0.5)
 points(x=subset_crown_other$age_mean[subset_crown_other$clade=="Superrosids"], y=subset_crown_other$diversity[subset_crown_other$clade=="Superrosids"], pch=21, bg=pal['Superrosids'], cex=1, lwd=0.5)
 
-#points(x=subset_crown_t$age_mean[subset_crown_t$clade=="Superasterids"], y=subset_crown_t$diversity[subset_crown_t$clade=="Superasterids"], pch=24, bg=pal['Superasterids'], cex=1, lwd=0.5)
-#points(x=subset_crown_other$age_mean[subset_crown_other$clade=="Superasterids"], y=subset_crown_other$diversity[subset_crown_other$clade=="Superasterids"], pch=21, bg=pal['Superasterids'], cex=1, lwd=0.5)
-
-#points(x=subset_crown_t$age_mean[subset_crown_t$clade=="Magnoliids"], y=subset_crown_t$diversity[subset_crown_t$clade=="Magnoliids"], pch=24, bg=pal['Magnoliids'], cex=1, lwd=0.5)
-#points(x=subset_crown_other$age_mean[subset_crown_other$clade=="Magnoliids"], y=subset_crown_other$diversity[subset_crown_other$clade=="Magnoliids"], pch=21, bg=pal['Magnoliids'], cex=1, lwd=0.5)
-
-#points(x=subset_crown_t$age_mean[subset_crown_t$clade=="Monocots"], y=subset_crown_t$diversity[subset_crown_t$clade=="Monocots"], pch=24, bg=pal['Monocots'], cex=1, lwd=0.5)
-#points(x=subset_crown_other$age_mean[subset_crown_other$clade=="Monocots"], y=subset_crown_other$diversity[subset_crown_other$clade=="Monocots"], pch=21, bg=pal['Monocots'], cex=1, lwd=0.5)
-
-#points(x=lsca.df.sum$Age_mean, y=lsca.df.sum$Clade_richness, pch=22, bg='white', cex=1.2)
-#text(x=lsca.df.sum$Age_mean+c(-10,10,-10), y=lsca.df.sum$Clade_richness-c(1000,2000,1000), c("D", "P", "R"), cex=.8)
 
 # adding axes
 par(lwd=.6)
@@ -91,17 +101,12 @@ mtext(text="Species richness", side=2, line=1.5, cex=.5)
 par(lwd=.5)
 
 # adding CI lines
-length_x <- length(limits.df$lb[limits.df$Diversity==352000])
-lines(y=limits.df$lb[limits.df$Diversity==352000], x=1:length_x)
-lines(y=limits.df$ub[limits.df$Diversity==352000], x=1:length_x)
-#lines(y=limits.df$lb[limits.df$Diversity==10293], x=1:length_x,lty=2)
-#lines(y=limits.df$ub[limits.df$Diversity==10293], x=1:length_x,lty=2)
-#lines(y=limits.df$lb[limits.df$Diversity==69335], x=1:length_x,lty=3)
-#lines(y=limits.df$ub[limits.df$Diversity==69335], x=1:length_x,lty=3)
-#lines(y=limits.df$lb[limits.df$Diversity==87302], x=1:length_x,lty=4)
-#lines(y=limits.df$ub[limits.df$Diversity==87302], x=1:length_x,lty=4)
-lines(y=limits.df$lb[limits.df$Diversity==111856], x=1:length_x,lty=5)
-lines(y=limits.df$ub[limits.df$Diversity==111856], x=1:length_x,lty=5)
+length_x <- length(limits.df$lb[limits.df$Diversity==111856])
+lines(y=limits.df$lb[limits.df$Diversity==111856], x=1:length_x)
+lines(y=limits.df$ub[limits.df$Diversity==111856], x=1:length_x)
+
+lines(y=limits.df_high$lb[limits.df_high$Diversity==111856], x=1:length_x,lty=5)
+lines(y=limits.df_high$ub[limits.df_high$Diversity==111856], x=1:length_x,lty=5)
 
 #legend(lty=1:5, c("All angiosperms","Magnoliids","Monocots","Superasterids","Superrosids"), x=150, y=5, bty="n", cex = .7, lwd=.8)
 legend(pch=c(21,24), legend = c("other", "tendrils"), x=0, y=1000, bty="n", cex = .7, pt.cex=1.25)
@@ -124,9 +129,9 @@ mtext(text="Species richness", side=2, line=1.5, cex=.5)
 par(lwd=.5)
 
 # adding CI lines
-length_x <- length(limits.df$lb[limits.df$Diversity==352000])
-lines(y=limits.df$lb[limits.df$Diversity==352000], x=1:length_x)
-lines(y=limits.df$ub[limits.df$Diversity==352000], x=1:length_x)
+length_x <- length(limits.df_low$lb[limits.df_low$Diversity==352000])
+lines(y=limits.df_low$lb[limits.df_low$Diversity==352000], x=1:length_x)
+lines(y=limits.df_low$ub[limits.df_low$Diversity==352000], x=1:length_x)
 #lines(y=limits.df$lb[limits.df$Diversity==10293], x=1:length_x,lty=2)
 #lines(y=limits.df$ub[limits.df$Diversity==10293], x=1:length_x,lty=2)
 #lines(y=limits.df$lb[limits.df$Diversity==69335], x=1:length_x,lty=3)
@@ -140,3 +145,34 @@ lines(y=limits.df$ub[limits.df$Diversity==87302], x=1:length_x,lty=4)
 legend(pch=c(21,24), legend = c("other", "tendrils"), x=0, y=1000, bty="n", cex = .7, pt.cex=1.25)
 
 dev.off()
+
+
+#####
+
+test.line_low <- approxfun(x=1:length_x, y=limits.df_low$lb[limits.df_low$Diversity==87302])
+test.line_high <- approxfun(x=1:length_x, y=limits.df_high$ub[limits.df_high$Diversity==87302])
+
+keep <- c()
+for(i in 1:nrow(subset_stem)) {
+  if(!is.na(test.line_low(subset_stem$age_mean[i]))){
+    if(test.line_low(subset_stem$age_mean[i]) > subset_stem$diversity[i])
+      keep <- c(keep,i)    
+  }
+}
+
+# clades below lower bound:
+lower_div <- as.data.frame(subset_stem[keep,])
+write.csv(lower_div, file="clades_below_lower_bound_stem.csv")
+
+
+keep <- c()
+for(i in 1:nrow(subset_stem)) {
+  if(!is.na(test.line_high(subset_stem$age_mean[i]))){
+    if(test.line_high(subset_stem$age_mean[i]) < subset_stem$diversity[i])
+      keep <- c(keep,i)    
+  }
+}
+
+# clades above upper bound:
+upper_div <- as.data.frame(subset_stem[keep,])
+write.csv(upper_div, file="clades_above_uper_bound_stem.csv")

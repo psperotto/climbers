@@ -49,12 +49,14 @@ all_climbers_comparison1$CM[which(all_climbers_comparison1$CM==8)] <- "Other"
 all_climbers_comparison1_sros <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superrosids")
 
 div_rates_sros <- all_climbers_comparison1_sros$div_rate_eps0
+#median(div_rates_sros)
 names(div_rates_sros) <- all_climbers_comparison1_sros$taxa
 mech_sros <- all_climbers_comparison1_sros$CM
 names(mech_sros) <- all_climbers_comparison1_sros$taxa
 
 all_genera_tree_ros <- keep.tip(all_genera_tree, all_climbers_comparison1_sros$taxa)
 climb_comparison1_ros_stem <- phylANOVA(all_genera_tree_ros, mech_sros, div_rates_sros ,nsim=1000, p.adj="bonferroni")
+
 
 #########################################################
 # Superasterids
@@ -98,6 +100,22 @@ plot_comparisons_ast1_stem <- ggplot(all_climbers_comparison1_sast, aes(x=CM, y=
   theme(axis.text.y = element_text(colour = 'black', size = 5),
         axis.text.x = element_text(colour = 'black', size = 5),
         axis.title.x = element_text(colour = 'black', size = 10)) 
+
+####
+#median
+rosids <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superrosids")
+asterids <- subset(all_climbers_comparison1, all_climbers_comparison1$clade=="Superasterids")
+
+median(rosids$div_rate_eps0[rosids$CM=="Specialist"])
+median(rosids$div_rate_eps0[rosids$CM=="Other"])
+median(rosids$div_rate_eps0.9[rosids$CM=="Specialist"])
+median(rosids$div_rate_eps0.9[rosids$CM=="Other"])
+
+median(asterids$div_rate_eps0[asterids$CM=="Specialist"])
+median(asterids$div_rate_eps0[asterids$CM=="Other"])
+median(asterids$div_rate_eps0.9[asterids$CM=="Specialist"])
+median(asterids$div_rate_eps0.9[asterids$CM=="Other"])
+
 
 #########################################################
 # Comparison including tendrils (trait 2) as specialized mechanism, extinction fraction 0.9
