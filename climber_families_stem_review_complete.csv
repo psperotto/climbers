@@ -1,9 +1,9 @@
 taxa,diversity,node,age_mean,clade,CM
-Malpighiaceae,,SG,,NA,NA
-Bignoniaceae,,SG,,NA,NA
-Fabaceae,,SG,,NA,NA
-Cucurbitaceae,,SG,,NA,NA
-Apocynaceae,,SG,,NA,NA
+Malpighiaceae,1250,SG,73.9,NA,NA
+Bignoniaceae,790,SG,47,NA,NA
+Fabaceae,19580,SG,92.1,NA,NA
+Cucurbitaceae,1000,SG,57.1,NA,NA
+Apocynaceae,4555,SG,52.1,NA,NA
 Adelphia,4,SG,5.422,Malpighiaceae,1
 Adenocalymma,93,SG,13.447,Bignoniaceae,2
 Aenigmatanthera,2,SG,4.868,Malpighiaceae,1
