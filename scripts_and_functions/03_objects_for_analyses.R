@@ -1,13 +1,16 @@
 # Script for preparing the objects for the diversification and spatial analyses
 
 ## Reading data
-library(xlsx)
-APGIV <- read.xlsx("C:/Users/patri/Desktop/temp/APGIV.xlsx", sheetIndex = 1) # list of angiosperm families, orders and clades following APG IV
-wcvp_names <- read.table("C:/Users/patri/Desktop/temp/wcvp_names_and_distribution_special_edition_2022/wcvp_names.txt", sep="|", header=T, quote = "", fill=TRUE, encoding = "UTF-8")
-climbers_final <- read.csv(file = "climbers_final.csv")[,2:10]
+#library(xlsx)
+#APGIV <- read.xlsx("C:/Users/patri/Desktop/temp/APGIV.xlsx", sheetIndex = 1) # list of angiosperm families, orders and clades following APG IV
+APGIV <- read.csv("datasets/APGIV.csv") # list of angiosperm families, orders and clades following APG IV
+
+#wcvp_names <- read.table("C:/Users/patri/Desktop/temp/wcvp_names_and_distribution_special_edition_2022/wcvp_names.txt", sep="|", header=T, quote = "", fill=TRUE, encoding = "UTF-8")
+#climbers_final <- read.csv(file = "climbers_final.csv")[,2:10]
+climbers_final <- read.csv(file = "datasets/database_corrected.csv")
 # alternatively: climbers_final <- readRDS(file="climbers_final.Rdata")
 library(ape)
-tree <- read.tree(file="GBMB.tre")
+tree <- read.tree(file="trees/GBMB.tre")
 
 ## Counting species of climbers per family
 spp.family<-as.data.frame(table(unlist(climbers_final$family)))
@@ -33,6 +36,7 @@ rownames(spp.all) <-c (1:786)
 
 saveRDS(spp.all, file="spp.all.Rdata")
 
+spp.all <- readRDS("spp.all.Rdata")
 ## checking if the genera in spp.genera and spp.all match
 spp.genera[,1] == spp.all[,1] # checking if the genera in both table are the same
 # all are TRUE, ok!
@@ -62,7 +66,7 @@ tree$tip.label<-list
 
 saveRDS(tree, file="treegenera.Rdata")
 
-# function to get node ages -> THAIS: não sei se deixo isso aqui ja q tem um script só com as funções
+# function to get node ages -> THAIS: n?o sei se deixo isso aqui ja q tem um script s? com as fun??es
 get.node.age <- function (phy) {
   root.node <- length(phy$tip.label)+1
   seq.nodes <- phy$edge
@@ -116,7 +120,7 @@ rownames(ages)<-c(1:176)
 #saveRDS(ages, file = "ages.Rdata")
 
 ##############################################################################
-##### Table for the Magallón & Sanderson (2001) analyses with crown ages #####
+##### Table for the Magall?n & Sanderson (2001) analyses with crown ages #####
 
 ## creating pre-table with the genera, their crown ages and number of species
 library(dplyr)
@@ -152,8 +156,8 @@ for (k in 1:length(table$Genus)) {
   }
 }
 
-## Adjusting major clades of the table to be just "Magnoliids", "Monocots", "Superrosids" and "Superasterids" (and 'Ranunculales') sensu Magallón et al. (2015)
-table[,"Clade_M2015"]<-NA # 'M2015' is in reference to Magallón et al. (2015)
+## Adjusting major clades of the table to be just "Magnoliids", "Monocots", "Superrosids" and "Superasterids" (and 'Ranunculales') sensu Magall?n et al. (2015)
+table[,"Clade_M2015"]<-NA # 'M2015' is in reference to Magall?n et al. (2015)
 for (i in 1:length(table$Clade)) {
   if (table$Clade[i] == "Asterids") {
     table$Clade_M2015[i] <- "Superasterids"
@@ -174,7 +178,7 @@ for (i in 1:length(table$Clade)) {
   }
 }
 
-## Creating final tables for Magallón & Sanderson's (2001) analyses
+## Creating final tables for Magall?n & Sanderson's (2001) analyses
 a<-data.frame(taxa=table$Genus,
                 diversity=table$Nr,
                 node=c("CG"),
@@ -227,7 +231,7 @@ bg.clades[[7]]<-bg.all
 saveRDS(bg.clades, file = "bg.clades.crown.Rdata")
 
 ##############################################################################
-##### Table for the Magallón & Sanderson (2001) analyses with stem ages #####
+##### Table for the Magall?n & Sanderson (2001) analyses with stem ages #####
 
 ## creating pre-table with the genera, their stem ages and number of species
 library(dplyr)
@@ -241,7 +245,7 @@ colnames(t)<-c("Genus", "Stem_Age", "Nr")
 genera_list <- t$Genus 
 include <- data.frame(matrix(nrow=0,ncol=2))
 for(i in 1:length(genera_list)){
-  subset <- climbers_final[climbers_final$genus==genera_list[i],]
+  subset <- climbers_final[climbers_final$Genus==genera_list[i],]
   if(length(table(subset$CM))==1) {
     include <- rbind(include, c(genera_list[i], subset$CM[1]))
   } 
@@ -251,10 +255,10 @@ table <- merge(t, include, by="Genus")
 
 ## Assiging genera to major angiosperm clades
 for (k in 1:length(table$Genus)) {
-  i <- which(climbers_final$genus == table$Genus[k])
+  i <- which(climbers_final$Genus == table$Genus[k])
   for (p in 1:length(APGIV$family)) {
-    m<-unique(climbers_final$family[i])
-    if (m == APGIV$family[p]) {
+    m<-unique(climbers_final$Family[i])
+    if (m[1] == APGIV$family[p]) {
       table[k,"Family"] <- APGIV$family[p]
       table[k,"Order"] <- APGIV$order[p]
       table[k,"Clade"] <- APGIV$clade[p]
@@ -262,8 +266,8 @@ for (k in 1:length(table$Genus)) {
   }
 }
 
-## Adjusting major clades of the table to be just "Magnoliids", "Monocots", "Superrosids" and "Superasterids" (and 'Ranunculales') sensu Magallón et al. (2015)
-table[,"Clade_M2015"]<-NA # 'M2015' is in reference to Magallón et al. (2015)
+## Adjusting major clades of the table to be just "Magnoliids", "Monocots", "Superrosids" and "Superasterids" (and 'Ranunculales') sensu Magall?n et al. (2015)
+table[,"Clade_M2015"]<-NA # 'M2015' is in reference to Magall?n et al. (2015)
 for (i in 1:length(table$Clade)) {
   if (table$Clade[i] == "Asterids") {
     table$Clade_M2015[i] <- "Superasterids"
@@ -284,12 +288,12 @@ for (i in 1:length(table$Clade)) {
   }
 }
 
-## Creating final tables for Magallón & Sanderson's (2001) analyses
+## Creating final tables for Magall?n & Sanderson's (2001) analyses
 a<-data.frame(taxa=table$Genus,
               diversity=table$Nr,
-              node=c("SG"),
-              age_mean=as.numeric(table$Crown_Age),
-              clade=table$Clade_M2015,
+              node=rep("SG",length(table$Nr)),
+              age_mean=as.numeric(table$Stem_Age),
+              clade=table$Family,
               CM=table$CM,
               stringsAsFactors = FALSE)
 
@@ -334,4 +338,9 @@ bg.clades[[4]]<-bg.sros
 bg.clades[[5]]<-bg.sast
 bg.clades[[6]]<-bg.ranunc
 bg.clades[[7]]<-bg.all
-saveRDS(bg.clades, file = "bg.clades.stem.Rdata")
+
+saveRDS(bg.clades, file = "REVIEW_bg.clades.stem.Rdata")
+
+
+
+

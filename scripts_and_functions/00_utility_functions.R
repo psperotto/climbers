@@ -14,7 +14,7 @@ gbif.taxize <- function (species) {
     }
     return(new.name)
   }
-  new.names <- pbapply::pbsapply(species, gnr_resolve_x, cl=48)
+  new.names <- pbapply::pbsapply(species, gnr_resolve_x, cl=4)
   return(new.names)
 }
 

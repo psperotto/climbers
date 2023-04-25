@@ -33,9 +33,14 @@ climber_points <- as.data.frame(climber_points)
 all_angios <- as.data.frame(all_angios)
 >>>>>>> 6e9ab718bea0c1fb821d2bb21cd2ff94f0d81e3f
 
+<<<<<<< HEAD
+climber_diversity_raster <- mapDiversity(climber_points, resolution = 1.2, plot=F)
+neotropics_diversity_raster <- mapDiversity(all_angios, resolution = 1.2, plot=F)
+=======
 ## All angiosperms
 all_angios<-as.data.frame(all_angios)
 neotropics_diversity_raster <- mapDiversity(all_angios, resolution = 1.2, plot=F,plot.with.grid = F)
+>>>>>>> bf6c53e85d92878ed282936636f856ad46d3acbd
 
 ## All climbers
 all_climbers <- paste(climbers_final$taxon_name, climbers_final$taxon_authors, sep=" ")
@@ -167,4 +172,8 @@ plot(hybridshp, add=T)
 plot(hg_climb_map,col=pal,zlim=c(0,.08),main="Proportion of hooks/grapnels in relation \nto all climbing mechanisms")
 plot(hybridshp, add=T)
 
+<<<<<<< HEAD
+
+=======
 dev.off()
+>>>>>>> bf6c53e85d92878ed282936636f856ad46d3acbd
