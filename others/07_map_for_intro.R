@@ -1,3 +1,0 @@
-# Map for introduction
-
-
