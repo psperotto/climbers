@@ -127,7 +127,7 @@ ClimateFromPoint_custom <- function(points, species="species",lon="lon", lat="la
 #' @param points A data.frame of three columns containing species and coordinates
 #' @param species A character string indicating name of column with species names
 #' @param lat A character string indicating name of column with latitudes
-#' @param lon character string indicating name of column with longitudes
+#' @param lon A character string indicating name of column with longitudes
 #' @param n A number indicating how many points to keep in each cell after thinning
 GetClimateSummStats_custom <- function (points, type=c("raw","transformed")) {
   tmp_points <- points[,-which(colnames(points) %in% c("lon","lat"))]

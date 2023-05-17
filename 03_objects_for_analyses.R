@@ -1,8 +1,6 @@
 # Script for preparing the objects for the diversification and spatial analyses
 
 ## Reading data
-#library(xlsx)
-#APGIV <- read.xlsx("C:/Users/patri/Desktop/temp/APGIV.xlsx", sheetIndex = 1) # list of angiosperm families, orders and clades following APG IV
 APGIV <- read.csv("datasets/APGIV.csv") # list of angiosperm families, orders and clades following APG IV
 
 #wcvp_names <- read.table("C:/Users/patri/Desktop/temp/wcvp_names_and_distribution_special_edition_2022/wcvp_names.txt", sep="|", header=T, quote = "", fill=TRUE, encoding = "UTF-8")
@@ -66,20 +64,7 @@ tree$tip.label<-list
 
 saveRDS(tree, file="treegenera.Rdata")
 
-# function to get node ages -> THAIS: n?o sei se deixo isso aqui ja q tem um script s? com as fun??es
-get.node.age <- function (phy) {
-  root.node <- length(phy$tip.label)+1
-  seq.nodes <- phy$edge
-  dists <- phy$edge.length
-  res <- numeric(max(phy$edge))
-  for (i in seq_len(nrow(seq.nodes))) {
-    res[seq.nodes[i, 2]] <- res[seq.nodes[i,1]] + dists[i]
-  }
-  ages <- abs(round(res,3)-round(max(res),3))
-  return(ages)
-} 
-
-## Getting the ages of genera
+## Getting ages of genera
 treegenera <- readRDS("treegenera.Rdata")
 library(phangorn)
 genera <- as.character(genera75$Genus)
@@ -120,7 +105,7 @@ rownames(ages)<-c(1:176)
 #saveRDS(ages, file = "ages.Rdata")
 
 ##############################################################################
-##### Table for the Magall?n & Sanderson (2001) analyses with crown ages #####
+##### Table for the Magallon & Sanderson (2001) analyses with crown ages #####
 
 ## creating pre-table with the genera, their crown ages and number of species
 library(dplyr)
@@ -231,7 +216,7 @@ bg.clades[[7]]<-bg.all
 saveRDS(bg.clades, file = "bg.clades.crown.Rdata")
 
 ##############################################################################
-##### Table for the Magall?n & Sanderson (2001) analyses with stem ages #####
+##### Table for the Magallon & Sanderson (2001) analyses with stem ages #####
 
 ## creating pre-table with the genera, their stem ages and number of species
 library(dplyr)

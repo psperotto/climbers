@@ -62,7 +62,7 @@ Script for diversification analyses considering different percentage cutoffs of 
 
 > 10_family_background.R
 
-Constrasts climbing genera of a few selected families against the diversification rates of such families as background.
+Constrasts climbing genera of a few selectde families against the diversification rates of such families as background.
 
 > 11_div_rates_phyloanova.R
 
